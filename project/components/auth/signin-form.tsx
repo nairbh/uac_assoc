@@ -7,38 +7,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, isLoading, error: authError } = useAuth();
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
-    // Simuler une vérification d'identifiants (à remplacer par une vraie API)
-    // Si l'email est "admin@atmf-argenteuil.org" et le mot de passe "admin", on considère que c'est un admin
     try {
-      if (email === 'admin@atmf-argenteuil.org' && password === 'admin') {
-        // Simuler un délai de chargement
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userRole', 'admin');
-        router.push('/admin');
-      } else {
-        // Simuler un délai de chargement
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setError('Identifiants incorrects. Veuillez réessayer.');
-      }
-    } catch (error) {
-      setError('Une erreur est survenue. Veuillez réessayer plus tard.');
-    } finally {
-      setIsLoading(false);
+      await signIn(email, password);
+      router.push('/admin');
+    } catch (error: any) {
+      setError(error.message || 'Une erreur est survenue. Veuillez réessayer plus tard.');
     }
   };
 
@@ -90,8 +77,8 @@ export function SignInForm() {
             Se souvenir de moi
           </Label>
         </div>
-        {error && (
-          <div className="text-red-500 text-sm">{error}</div>
+        {(error || authError) && (
+          <div className="text-red-500 text-sm">{error || authError}</div>
         )}
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? (

@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
-import { usePermissions, Permission } from '@/hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 
 // Type pour un élément de menu
@@ -38,7 +38,7 @@ interface NavItem {
   title: string;
   href: string;
   icon: React.ElementType;
-  permission?: Permission; // Permission requise pour afficher cet élément
+  permission?: string; // Permission requise pour afficher cet élément
 }
 
 export default function AdminLayout({
@@ -120,11 +120,11 @@ export default function AdminLayout({
 
   // Filtrer les éléments du menu selon les permissions
   const filteredNavItems = navItems.filter(item => 
-    !item.permission || hasPermission(item.permission)
+    !item.permission || hasPermission(item.permission as any)
   );
 
   return (
-    <ProtectedRoute requiredRole="moderator">
+    <ProtectedRoute requiredRole="admin">
       <div className="min-h-screen bg-muted/30">
         {/* Sidebar */}
         <aside

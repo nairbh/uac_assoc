@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -382,7 +383,8 @@ export default function UsersManagement() {
             <div className="space-y-2">
               <p className="text-sm font-medium">Rôle actuel:</p>
               <Badge variant="outline" className={cn("flex w-fit items-center gap-1", roles[selectedUser?.role as Role]?.color)}>
-                {roles[selectedUser?.role as Role]?.icon && React.createElement(roles[selectedUser?.role as Role]?.icon, { className: "h-3.5 w-3.5" })}
+                {roles[selectedUser?.role as Role]?.icon && 
+                  React.createElement(roles[selectedUser?.role as Role]?.icon as React.ElementType, { className: "h-3.5 w-3.5" })}
                 {roles[selectedUser?.role as Role]?.label || selectedUser?.role}
               </Badge>
             </div>

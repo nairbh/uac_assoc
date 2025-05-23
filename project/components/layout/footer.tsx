@@ -46,7 +46,8 @@ export function Footer() {
                   src="/images/logo.png" 
                   alt="ATMF Logo" 
                   width={48} 
-                  height={48} 
+                  height={48}
+                  style={{ width: 'auto', height: 'auto' }}
                   className="object-contain" 
                 />
               </motion.div>

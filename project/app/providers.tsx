@@ -7,11 +7,16 @@ import { ToastNotificationProvider } from '@/components/ui/toast';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light">
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <ToastNotificationProvider>
         <AuthProvider>
-      {children}
-      <Toaster />
+          {children}
+          <Toaster />
         </AuthProvider>
       </ToastNotificationProvider>
     </ThemeProvider>

@@ -73,7 +73,8 @@ export function Navbar() {
               src="/images/logo.png" 
               alt="ATMF Logo" 
               width={48} 
-              height={48} 
+              height={48}
+              style={{ width: 'auto', height: 'auto' }}
               className="object-contain"
             />
           </motion.div>
@@ -194,7 +195,8 @@ export function Navbar() {
                     src="/images/logo.png" 
                     alt="ATMF Logo" 
                     width={40} 
-                    height={40} 
+                    height={40}
+                    style={{ width: 'auto', height: 'auto' }}
                     className="object-contain" 
                   />
                   <span className="font-bold">
