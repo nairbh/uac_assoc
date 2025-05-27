@@ -137,7 +137,7 @@ export function Footer() {
                 <div className="bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900 dark:to-rose-800 p-2 rounded-lg">
                   <Phone className="h-5 w-5 text-rose-600" />
                 </div>
-                <span className="text-muted-foreground">+33 1 XX XX XX XX</span>
+                <span className="text-muted-foreground">01 39 82 81 48</span>
               </motion.li>
               <motion.li className="flex items-center gap-3" whileHover={{ x: 3 }}>
                 <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 p-2 rounded-lg">

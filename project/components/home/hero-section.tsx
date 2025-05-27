@@ -19,7 +19,7 @@ export function HeroSection() {
         transition={{ duration: 10, ease: "easeOut" }}
         className="absolute inset-0 bg-cover bg-center" 
         style={{ 
-          backgroundImage: 'url(https://images.unsplash.com/photo-1593113598332-cd59a93333c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80)', 
+          backgroundImage: 'url(https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80)', 
           zIndex: 0 
         }} 
       />
@@ -69,7 +69,7 @@ export function HeroSection() {
                   Faire un don
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 text-lg h-14 px-6 rounded-xl shadow-lg transition-all hover:translate-y-[-2px]" asChild>
+              <Button size="lg" variant="outline" className="border-white text-red-700 hover:bg-white/20 text-lg h-14 px-6 rounded-xl shadow-lg transition-all hover:translate-y-[-2px]" asChild>
                 <Link href="/membership">
                   <Users className="mr-2 h-5 w-5" />
                   Devenir bénévole
@@ -155,26 +155,6 @@ export function HeroSection() {
       
       {/* Bottom gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-20" />
-      
-      {/* Testimonial banner */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 bg-red-700/80 backdrop-blur-sm py-4">
-        <div className="container">
-          <div className="flex overflow-x-auto gap-6 no-scrollbar">
-            <p className="text-white/90 whitespace-nowrap">
-              <span className="font-semibold">Ahmed, 67 ans :</span> "L'ATMF m'a aidé dans toutes mes démarches administratives."
-            </p>
-            <p className="text-white/90 whitespace-nowrap">
-              <span className="font-semibold">Fatima, 42 ans :</span> "Grâce aux cours de français, j'ai pu trouver un emploi."
-            </p>
-            <p className="text-white/90 whitespace-nowrap">
-              <span className="font-semibold">Karim, 14 ans :</span> "Le soutien scolaire m'a permis d'améliorer mes notes."
-            </p>
-            <p className="text-white/90 whitespace-nowrap">
-              <span className="font-semibold">Samira, 35 ans :</span> "Sans l'aide de l'ATMF, je n'aurais pas pu régulariser ma situation."
-            </p>
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

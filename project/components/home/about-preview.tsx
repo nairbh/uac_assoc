@@ -166,7 +166,7 @@ export function AboutPreview() {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-4 text-white">
+            <div className="absolute top-0 left-0 p-4 text-white">
               <p className="font-medium text-sm">Accompagnement scolaire, Argenteuil</p>
             </div>
           </motion.div>
@@ -197,9 +197,9 @@ export function AboutPreview() {
             whileHover={{ y: -5 }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1532635241-17e820acc59f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
-              alt="Groupe de seniors" 
-              className="w-full h-full object-cover"
+              src="/images/pang-yuhao-GBIFH9Lv2DM-unsplash.jpg" 
+              alt="Homme âgé souriant assis sur un banc tenant une canne" 
+              className="w-full h-full object-cover" style={{ objectPosition: 'center 20%' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-4 text-white">

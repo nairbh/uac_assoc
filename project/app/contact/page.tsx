@@ -82,7 +82,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-lg">Téléphone</h3>
                   <p className="text-muted-foreground">
-                    +33 1 XX XX XX XX
+                    01 39 82 81 48
                   </p>
                 </div>
               </div>
