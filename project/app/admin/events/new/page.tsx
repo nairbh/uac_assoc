@@ -26,9 +26,15 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/hooks/useAuth';
+import { usePermissions } from '@/hooks/usePermissions';
+import { createEvent } from '@/lib/db/events';
+import { toast } from 'sonner';
 
 export default function NewEventPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { hasPermission } = usePermissions();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -39,7 +45,16 @@ export default function NewEventPage() {
   const [price, setPrice] = useState('0');
   const [isFree, setIsFree] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [event, setEvent] = useState({
+    title: '',
+    description: '',
+    date: '',
+    time: '',
+    location: '',
+    max_participants: null as number | null,
+    status: 'draft' as 'draft' | 'published' | 'cancelled' | 'completed',
+  });
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -62,18 +77,17 @@ export default function NewEventPage() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     setIsSubmitting(true);
-    
     try {
-      // Ici, on simule un enregistrement d'événement
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirection vers la liste des événements
-      router.push('/admin?tab=events');
+      await createEvent(event);
+      toast.success('Événement créé avec succès');
+      router.push('/admin/events');
     } catch (error) {
-      console.error('Erreur lors de la création de l\'événement:', error);
+      console.error('Erreur lors de la création:', error);
+      toast.error('Erreur lors de la création de l\'événement');
     } finally {
       setIsSubmitting(false);
     }
@@ -118,8 +132,8 @@ export default function NewEventPage() {
               <Input 
                 id="title" 
                 placeholder="Entrez le titre de votre événement" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={event.title}
+                onChange={(e) => setEvent({ ...event, title: e.target.value })}
                 required
               />
             </div>
@@ -130,8 +144,8 @@ export default function NewEventPage() {
                 id="description" 
                 placeholder="Décrivez votre événement..." 
                 className="min-h-[200px]"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={event.description}
+                onChange={(e) => setEvent({ ...event, description: e.target.value })}
                 required
               />
             </div>
@@ -170,8 +184,8 @@ export default function NewEventPage() {
                   <Input 
                     id="time" 
                     type="time" 
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    value={event.time}
+                    onChange={(e) => setEvent({ ...event, time: e.target.value })}
                     required
                   />
                 </div>
@@ -185,8 +199,8 @@ export default function NewEventPage() {
                 <Input 
                   id="location" 
                   placeholder="Adresse de l'événement" 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  value={event.location}
+                  onChange={(e) => setEvent({ ...event, location: e.target.value })}
                   required
                 />
               </div>
@@ -226,8 +240,8 @@ export default function NewEventPage() {
                     id="max-attendees" 
                     type="number" 
                     min="1" 
-                    value={maxAttendees}
-                    onChange={(e) => setMaxAttendees(e.target.value)}
+                    value={event.max_participants || ''}
+                    onChange={(e) => setEvent({ ...event, max_participants: parseInt(e.target.value) || null })}
                   />
                 </div>
               </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -8,7 +9,6 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Calendar,
@@ -21,72 +21,11 @@ import {
   BookOpen,
   GraduationCap
 } from 'lucide-react';
+import { getEvents } from '@/lib/db/events';
 
-// Données d'événements basées sur les activités réelles de l'ATMF Argenteuil
-const events = [
-  {
-    id: 1,
-    title: "Fête de la Réussite",
-    date: "25 juin 2025",
-    time: "14:00 - 18:00",
-    location: "Centre social ATMF, Argenteuil",
-    category: "Célébration",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    description: "Célébration de fin d'année scolaire pour mettre à l'honneur les réussites des jeunes accompagnés par l'ATMF Argenteuil. Remise de diplômes, animations et goûter festif."
-  },
-  {
-    id: 2,
-    title: "Atelier sociolinguistique - Démarches administratives",
-    date: "10 mai 2025",
-    time: "14:00 - 16:30",
-    location: "Salle ASL, 26 bd du Général Leclerc, Argenteuil",
-    category: "Formation",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
-    description: "Atelier d'apprentissage du français orienté sur les démarches administratives quotidiennes. Vocabulaire spécifique et simulation de situations réelles pour favoriser l'autonomie."
-  },
-  {
-    id: 3,
-    title: "Sortie familiale au Musée du Louvre",
-    date: "28 mai 2025",
-    time: "10:00 - 17:00",
-    location: "Départ du centre ATMF, Argenteuil",
-    category: "Sortie culturelle",
-    image: "https://images.unsplash.com/photo-1603966520549-66ac4166be99?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
-    description: "Journée de découverte culturelle pour les familles du quartier. Transport organisé depuis Argenteuil, visite guidée adaptée et moments d'échanges conviviaux."
-  },
-  {
-    id: 4,
-    title: "Fête des bénévoles",
-    date: "15 juin 2025",
-    time: "18:00 - 22:00",
-    location: "Centre social ATMF, Argenteuil",
-    category: "Célébration",
-    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    description: "Soirée conviviale pour remercier tous les bénévoles qui s'investissent dans les actions de l'ATMF Argenteuil. Repas partagé, animations et moments d'échange."
-  },
-  {
-    id: 5,
-    title: "Permanence d'accès aux droits",
-    date: "Tous les mardis",
-    time: "14:00 - 17:00",
-    location: "Bureau AIAS, 26 bd du Général Leclerc, Argenteuil",
-    category: "Accompagnement",
-    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    description: "Permanence hebdomadaire pour accompagner les habitants dans leurs démarches administratives. Aide à la compréhension des documents, rédaction de courriers et orientation vers les services compétents."
-  },
-  {
-    id: 6,
-    title: "Val en vacances - Activités jeunesse",
-    date: "10 juillet - 25 août 2025",
-    time: "10:00 - 17:00",
-    location: "Espace Jeunes, Argenteuil",
-    category: "Jeunesse",
-    image: "https://images.unsplash.com/photo-1472162072942-cd5147eb3902?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
-    description: "Programme d'animations estivales pour les jeunes du quartier Val d'Argent. Activités sportives, culturelles, sorties et ateliers créatifs pendant les vacances scolaires d'été."
-  }
-];
+export default async function EventsPage() {
+  const events = await getEvents();
 
-export default function EventsPage() {
   return (
     <div className="container py-12">
       <div className="space-y-6 text-center mb-12">
@@ -110,11 +49,12 @@ export default function EventsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toutes les catégories</SelectItem>
-              <SelectItem value="celebration">Célébration</SelectItem>
-              <SelectItem value="formation">Formation</SelectItem>
-              <SelectItem value="sortie">Sortie culturelle</SelectItem>
-              <SelectItem value="accompagnement">Accompagnement</SelectItem>
-              <SelectItem value="jeunesse">Jeunesse</SelectItem>
+              <SelectItem value="Institutionnel">Institutionnel</SelectItem>
+              <SelectItem value="Services">Services</SelectItem>
+              <SelectItem value="Éducation">Éducation</SelectItem>
+              <SelectItem value="Religieux">Religieux</SelectItem>
+              <SelectItem value="Culture">Culture</SelectItem>
+              <SelectItem value="Solidarité">Solidarité</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon">
@@ -128,7 +68,7 @@ export default function EventsPage() {
           <Card key={event.id} className="overflow-hidden h-full flex flex-col">
             <div className="aspect-video relative">
               <img 
-                src={event.image} 
+                src={event.image_url || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"} 
                 alt={event.title}
                 className="w-full h-full object-cover"
               />
@@ -140,38 +80,57 @@ export default function EventsPage() {
               <CardTitle className="line-clamp-1">{event.title}</CardTitle>
               <CardDescription className="flex items-center gap-1.5">
                 <Calendar className="h-4 w-4" />
-                {event.date}
+                {new Date(event.date).toLocaleDateString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 flex-1">
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                {event.time}
+                {event.time_start} - {event.time_end}
               </div>
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 {event.location}
               </div>
+              {event.max_participants && (
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Users className="h-4 w-4" />
+                  {event.current_participants} / {event.max_participants} participants
+                </div>
+              )}
               <p className="text-muted-foreground line-clamp-3 mt-2">
                 {event.description}
               </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
               <Button className="w-full" asChild>
-                <a href={`/events/${event.id}`}>
+                <Link href={`/events/${event.id}`}>
                   S'inscrire
-                </a>
+                </Link>
               </Button>
               <Button variant="outline" className="w-full" asChild>
-                <a href={`/events/${event.id}`}>
+                <Link href={`/events/${event.id}`}>
                   Détails
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
+
+      {events.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Aucun événement disponible pour le moment.</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Revenez bientôt pour découvrir nos prochaines activités !
+          </p>
+        </div>
+      )}
       
       <div className="mt-16 py-8 border-t">
         <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -180,9 +139,11 @@ export default function EventsPage() {
             <p className="text-muted-foreground">
               Si vous souhaitez proposer une activité ou participer à l'organisation d'un événement avec l'ATMF Argenteuil, n'hésitez pas à nous contacter.
             </p>
-            <Button className="gap-1" variant="outline">
-              <Users className="mr-2 h-4 w-4" />
-              Proposer une activité
+            <Button className="gap-1" variant="outline" asChild>
+              <Link href="/contact">
+                <Users className="mr-2 h-4 w-4" />
+                Proposer une activité
+              </Link>
             </Button>
           </div>
           <div className="space-y-4">
@@ -193,8 +154,8 @@ export default function EventsPage() {
                   <BookOpen className="h-5 w-5 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">La cordée du Val</h3>
-                  <p className="text-sm text-muted-foreground">Accompagnement scolaire - Lundi, mardi, jeudi</p>
+                  <h3 className="font-medium">Permanence d'aide administrative</h3>
+                  <p className="text-sm text-muted-foreground">Accompagnement aux démarches - Mardi et jeudi 14h-17h</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -202,8 +163,8 @@ export default function EventsPage() {
                   <GraduationCap className="h-5 w-5 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Ateliers sociolinguistiques</h3>
-                  <p className="text-sm text-muted-foreground">Apprentissage du français - Mardi, jeudi, vendredi</p>
+                  <h3 className="font-medium">Cours de français</h3>
+                  <p className="text-sm text-muted-foreground">Apprentissage du français - Lundi, mercredi, vendredi</p>
                 </div>
               </div>
             </div>

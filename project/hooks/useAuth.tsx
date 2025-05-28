@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (testUserAuth) {
         try {
           const testUser = JSON.parse(testUserAuth);
+          console.log('Utilisateur test trouvé:', testUser);
           setState({
             ...initialState,
             user: testUser.user,
@@ -72,18 +73,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
+        console.log('Initialisation de l\'authentification...');
+        
         // Récupérer la session actuelle depuis Supabase
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Erreur lors de la récupération de la session:', sessionError);
+          throw sessionError;
+        }
+        
+        console.log('Session récupérée:', session ? 'Connecté' : 'Non connecté');
         
         if (session?.user) {
+          console.log('Récupération du profil pour l\'utilisateur:', session.user.id);
+          
           // Si on a un utilisateur connecté, récupérer son profil
-          const { data: profile, error } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
             
-          if (error) throw error;
+          if (profileError) {
+            console.error('Erreur lors de la récupération du profil:', profileError);
+            // Ne pas throw l'erreur, juste logger et continuer
+          }
+          
+          console.log('Profil récupéré:', profile);
           
           setState({
             session,
@@ -98,25 +115,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         
         // Écouter les changements d'authentification
-        const { data: { subscription } } = await supabase.auth.onAuthStateChange(
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, newSession) => {
+            console.log('Changement d\'état d\'authentification:', event, newSession ? 'Connecté' : 'Déconnecté');
+            
             setState((prev) => ({ ...prev, session: newSession, user: newSession?.user || null }));
             
             // Si un utilisateur vient de se connecter, récupérer son profil
             if (event === 'SIGNED_IN' && newSession?.user) {
+              console.log('Récupération du profil après connexion...');
+              
               const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', newSession.user.id)
                 .single();
                 
-              if (!error) {
-                setState((prev) => ({
-                  ...prev,
-                  profile,
-                  isAdmin: profile?.role === 'admin',
-                }));
+              if (error) {
+                console.error('Erreur lors de la récupération du profil après connexion:', error);
+              } else {
+                console.log('Profil récupéré après connexion:', profile);
               }
+              
+              setState((prev) => ({
+                ...prev,
+                profile,
+                isAdmin: profile?.role === 'admin',
+                isLoading: false,
+              }));
             }
             
             // Si l'utilisateur se déconnecte, réinitialiser l'état
@@ -144,8 +170,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       
+      console.log('Tentative de connexion pour:', email);
+      
       // Pour faciliter les tests avec un compte admin
       if (email === 'admin@atmf-argenteuil.org' && password === 'admin') {
+        console.log('Connexion avec compte test admin');
+        
         // Créer un utilisateur test
         const testUser = {
           id: 'test-admin-user',
@@ -179,16 +209,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: null
         });
         
+        console.log('Connexion test réussie');
         return;
       }
       
       // Connexion normale avec Supabase
+      console.log('Connexion avec Supabase...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur de connexion Supabase:', error);
+        throw error;
+      }
+      
+      console.log('Connexion Supabase réussie:', data);
       
       // On ne met pas à jour l'état ici car l'écouteur onAuthStateChange le fera
     } catch (error: any) {
@@ -201,6 +238,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      
+      console.log('Tentative d\'inscription pour:', email);
       
       // Inscription avec Supabase
       const { data, error } = await supabase.auth.signUp({
@@ -216,22 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) throw error;
       
-      // Insérer le profil de l'utilisateur
-      if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            { 
-              id: data.user.id,
-              first_name: firstName,
-              last_name: lastName,
-              email,
-              role: 'member', // Par défaut
-            }
-          ]);
-          
-        if (profileError) throw profileError;
-      }
+      console.log('Inscription réussie:', data);
       
       setState((prev) => ({ ...prev, isLoading: false }));
     } catch (error: any) {
@@ -245,16 +269,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setState((prev) => ({ ...prev, isLoading: true }));
       
+      console.log('Déconnexion...');
+      
       // Si l'utilisateur est un utilisateur test
       if (localStorage.getItem('testUserAuth')) {
         localStorage.removeItem('testUserAuth');
         setState({ ...initialState, isLoading: false });
+        console.log('Déconnexion test réussie');
         return;
       }
       
       // Déconnexion normale avec Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      console.log('Déconnexion Supabase réussie');
       
       // L'écouteur onAuthStateChange va mettre à jour l'état
     } catch (error: any) {
