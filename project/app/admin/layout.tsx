@@ -68,7 +68,7 @@ export default function AdminLayout({
       title: 'Articles',
       href: '/admin?tab=articles',
       icon: FileText,
-      permission: 'create_article' // Seuls ceux ayant cette permission peuvent voir cette option
+      permission: 'create_article'
     },
     {
       title: 'Événements',
@@ -77,34 +77,16 @@ export default function AdminLayout({
       permission: 'create_event'
     },
     {
-      title: 'Membres',
-      href: '/admin?tab=members',
+      title: 'Équipe',
+      href: '/admin?tab=users',
       icon: Users,
       permission: 'manage_users'
     },
     {
-      title: 'Dons',
-      href: '/admin?tab=donations',
-      icon: Heart,
-      permission: 'manage_donations'
-    },
-    {
       title: 'Statistiques',
-      href: '/admin/analytics',
+      href: '/admin?tab=analytics',
       icon: BarChart,
       permission: 'view_analytics'
-    },
-    {
-      title: 'Modération',
-      href: '/admin/moderation',
-      icon: MessageCircle,
-      permission: 'moderate_comments'
-    },
-    {
-      title: 'Paramètres',
-      href: '/admin/settings',
-      icon: Settings,
-      permission: 'system_settings'
     }
   ];
 

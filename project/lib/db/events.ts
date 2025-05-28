@@ -10,7 +10,7 @@ export interface Event {
   category: string;
   date: string;
   time_start: string;
-  time_end: string;
+  time_end?: string;
   location: string;
   max_participants?: number;
   current_participants: number;
@@ -18,6 +18,39 @@ export interface Event {
   created_by?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CreateEventData {
+  title: string;
+  slug: string;
+  description: string;
+  details?: string;
+  image_url?: string;
+  category: string;
+  date: string;
+  time_start: string;
+  time_end?: string;
+  location: string;
+  max_participants?: number | null;
+  current_participants?: number;
+  status?: string;
+  created_by?: string | null;
+}
+
+export interface UpdateEventData {
+  title?: string;
+  slug?: string;
+  description?: string;
+  details?: string;
+  image_url?: string;
+  category?: string;
+  date?: string;
+  time_start?: string;
+  time_end?: string;
+  location?: string;
+  max_participants?: number | null;
+  status?: string;
+  updated_at?: string;
 }
 
 const DEFAULT_EVENT_IMAGES = {
@@ -34,208 +67,363 @@ function getDefaultImageForCategory(category: string): string {
   return DEFAULT_EVENT_IMAGES[category as keyof typeof DEFAULT_EVENT_IMAGES] || DEFAULT_EVENT_IMAGES.default;
 }
 
-export async function getEvents(): Promise<Event[]> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('status', 'published')
-    .order('date', { ascending: true });
-
-  if (error) {
-    console.error('Error fetching events:', error);
-    return [];
-  }
-
-  return data || [];
-}
-
-export async function getEventById(id: number): Promise<Event | null> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('Error fetching event:', error);
-    return null;
-  }
-
-  return data;
-}
-
-export async function getEventBySlug(slug: string): Promise<Event | null> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('slug', slug)
-    .single();
-
-  if (error) {
-    console.error('Error fetching event:', error);
-    return null;
-  }
-
-  return data;
-}
-
+// Récupérer tous les événements
 export async function getAllEvents(): Promise<Event[]> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('date', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching all events:', error);
+    if (error) {
+      console.error('Erreur lors de la récupération des événements:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements:', error);
     return [];
   }
-
-  return data || [];
 }
 
-export async function createEvent(eventData: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'current_participants'>): Promise<Event | null> {
-  // Si pas d'image fournie, utiliser l'image par défaut de la catégorie
-  const finalEventData = {
-    ...eventData,
-    image_url: eventData.image_url || getDefaultImageForCategory(eventData.category),
-    current_participants: 0
-  };
-  
-  const { data, error } = await supabase
-    .from('events')
-    .insert([finalEventData])
-    .select()
-    .single();
+// Récupérer les événements publiés
+export async function getPublishedEvents(): Promise<Event[]> {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'published')
+      .order('date', { ascending: true });
 
-  if (error) {
-    console.error('Error creating event:', error);
+    if (error) {
+      console.error('Erreur lors de la récupération des événements publiés:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements publiés:', error);
+    return [];
+  }
+}
+
+// Récupérer un événement par ID
+export async function getEventById(id: number): Promise<Event | null> {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Erreur lors de la récupération de l\'événement:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'événement:', error);
     return null;
   }
-
-  return data;
 }
 
-export async function updateEvent(id: number, eventData: Partial<Event>): Promise<Event | null> {
-  // Si l'image est supprimée, utiliser l'image par défaut
-  if (eventData.image_url === '' && eventData.category) {
-    eventData.image_url = getDefaultImageForCategory(eventData.category);
-  }
-  
-  const { data, error } = await supabase
-    .from('events')
-    .update(eventData)
-    .eq('id', id)
-    .select()
-    .single();
+// Récupérer un événement par slug
+export async function getEventBySlug(slug: string): Promise<Event | null> {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('slug', slug)
+      .single();
 
-  if (error) {
-    console.error('Error updating event:', error);
+    if (error) {
+      console.error('Erreur lors de la récupération de l\'événement:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'événement:', error);
     return null;
   }
-
-  return data;
 }
 
+// Créer un nouvel événement
+export async function createEvent(eventData: CreateEventData): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('events')
+      .insert([{
+        ...eventData,
+        current_participants: eventData.current_participants || 0,
+        status: eventData.status || 'draft',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }]);
+
+    if (error) {
+      console.error('Erreur lors de la création de l\'événement:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'événement:', error);
+    return false;
+  }
+}
+
+// Mettre à jour un événement
+export async function updateEvent(id: number, eventData: UpdateEventData): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('events')
+      .update({
+        ...eventData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Erreur lors de la mise à jour de l\'événement:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l\'événement:', error);
+    return false;
+  }
+}
+
+// Supprimer un événement
 export async function deleteEvent(id: number): Promise<boolean> {
-  const { error } = await supabase
-    .from('events')
-    .delete()
-    .eq('id', id);
+  try {
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
 
-  if (error) {
-    console.error('Error deleting event:', error);
+    if (error) {
+      console.error('Erreur lors de la suppression de l\'événement:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'événement:', error);
     return false;
   }
-
-  return true;
 }
 
+// Récupérer les événements par catégorie
+export async function getEventsByCategory(category: string): Promise<Event[]> {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('category', category)
+      .eq('status', 'published')
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('Erreur lors de la récupération des événements par catégorie:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements par catégorie:', error);
+    return [];
+  }
+}
+
+// Récupérer les événements à venir
+export async function getUpcomingEvents(limit?: number): Promise<Event[]> {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    let query = supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'published')
+      .gte('date', today)
+      .order('date', { ascending: true });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Erreur lors de la récupération des événements à venir:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements à venir:', error);
+    return [];
+  }
+}
+
+// Récupérer les événements passés
+export async function getPastEvents(limit?: number): Promise<Event[]> {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    let query = supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'published')
+      .lt('date', today)
+      .order('date', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Erreur lors de la récupération des événements passés:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements passés:', error);
+    return [];
+  }
+}
+
+// Inscrire un utilisateur à un événement
 export async function registerForEvent(eventId: number, userId: string): Promise<boolean> {
-  // Vérifier si l'utilisateur est déjà inscrit
-  const { data: existingRegistration } = await supabase
-    .from('event_registrations')
-    .select('id')
-    .eq('event_id', eventId)
-    .eq('user_id', userId)
-    .single();
+  try {
+    // Vérifier si l'utilisateur n'est pas déjà inscrit
+    const { data: existingRegistration } = await supabase
+      .from('event_registrations')
+      .select('id')
+      .eq('event_id', eventId)
+      .eq('user_id', userId)
+      .single();
 
-  if (existingRegistration) {
-    console.error('User already registered for this event');
-    return false;
-  }
+    if (existingRegistration) {
+      console.error('Utilisateur déjà inscrit à cet événement');
+      return false;
+    }
 
-  // Vérifier la capacité de l'événement
-  const event = await getEventById(eventId);
-  if (!event) {
-    console.error('Event not found');
-    return false;
-  }
+    // Vérifier la capacité de l'événement
+    const event = await getEventById(eventId);
+    if (!event) {
+      console.error('Événement non trouvé');
+      return false;
+    }
 
-  if (event.max_participants && event.current_participants >= event.max_participants) {
-    console.error('Event is full');
-    return false;
-  }
+    if (event.max_participants && event.current_participants >= event.max_participants) {
+      console.error('Événement complet');
+      return false;
+    }
 
-  // Créer l'inscription
-  const { error: registrationError } = await supabase
-    .from('event_registrations')
-    .insert([{
-      event_id: eventId,
-      user_id: userId,
-      status: 'registered'
-    }]);
+    // Inscrire l'utilisateur
+    const { error: registrationError } = await supabase
+      .from('event_registrations')
+      .insert([{
+        event_id: eventId,
+        user_id: userId,
+        status: 'registered',
+        registered_at: new Date().toISOString()
+      }]);
 
-  if (registrationError) {
-    console.error('Error creating registration:', registrationError);
-    return false;
-  }
+    if (registrationError) {
+      console.error('Erreur lors de l\'inscription:', registrationError);
+      return false;
+    }
 
-  // Mettre à jour le nombre de participants
-  const { error: updateError } = await supabase
-    .from('events')
-    .update({ 
-      current_participants: event.current_participants + 1 
-    })
-    .eq('id', eventId);
-
-  if (updateError) {
-    console.error('Error updating participant count:', updateError);
-    return false;
-  }
-
-  return true;
-}
-
-export async function unregisterFromEvent(eventId: number, userId: string): Promise<boolean> {
-  // Supprimer l'inscription
-  const { error: deleteError } = await supabase
-    .from('event_registrations')
-    .delete()
-    .eq('event_id', eventId)
-    .eq('user_id', userId);
-
-  if (deleteError) {
-    console.error('Error deleting registration:', deleteError);
-    return false;
-  }
-
-  // Mettre à jour le nombre de participants
-  const event = await getEventById(eventId);
-  if (event && event.current_participants > 0) {
+    // Mettre à jour le nombre de participants
     const { error: updateError } = await supabase
       .from('events')
-      .update({ 
-        current_participants: event.current_participants - 1 
+      .update({
+        current_participants: event.current_participants + 1,
+        updated_at: new Date().toISOString()
       })
       .eq('id', eventId);
 
     if (updateError) {
-      console.error('Error updating participant count:', updateError);
+      console.error('Erreur lors de la mise à jour du nombre de participants:', updateError);
       return false;
     }
-  }
 
-  return true;
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de l\'inscription à l\'événement:', error);
+    return false;
+  }
+}
+
+// Désinscrire un utilisateur d'un événement
+export async function unregisterFromEvent(eventId: number, userId: string): Promise<boolean> {
+  try {
+    // Supprimer l'inscription
+    const { error: deleteError } = await supabase
+      .from('event_registrations')
+      .delete()
+      .eq('event_id', eventId)
+      .eq('user_id', userId);
+
+    if (deleteError) {
+      console.error('Erreur lors de la désinscription:', deleteError);
+      return false;
+    }
+
+    // Mettre à jour le nombre de participants
+    const event = await getEventById(eventId);
+    if (event && event.current_participants > 0) {
+      const { error: updateError } = await supabase
+        .from('events')
+        .update({
+          current_participants: event.current_participants - 1,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', eventId);
+
+      if (updateError) {
+        console.error('Erreur lors de la mise à jour du nombre de participants:', updateError);
+        return false;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la désinscription de l\'événement:', error);
+    return false;
+  }
+}
+
+// Vérifier si un utilisateur est inscrit à un événement
+export async function isUserRegistered(eventId: number, userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('event_registrations')
+      .select('id')
+      .eq('event_id', eventId)
+      .eq('user_id', userId)
+      .eq('status', 'registered')
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Erreur lors de la vérification de l\'inscription:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.error('Erreur lors de la vérification de l\'inscription:', error);
+    return false;
+  }
 }
 
 export async function getUserEventRegistrations(userId: string): Promise<Event[]> {

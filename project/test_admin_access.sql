@@ -1,61 +1,72 @@
 -- Script de test pour vérifier l'accès admin
 -- À exécuter dans Supabase Studio (SQL Editor)
 
--- 1. Vérifier que l'utilisateur admin existe
+-- 1. Vérifier l'utilisateur admin
 SELECT 'VÉRIFICATION UTILISATEUR ADMIN:' as info;
 SELECT 
-  au.id,
-  au.email,
-  au.created_at as auth_created_at,
-  p.role,
-  p.created_at as profile_created_at
+    au.id,
+    au.email,
+    au.created_at as auth_created,
+    p.role,
+    p.first_name,
+    p.last_name,
+    p.created_at as profile_created
 FROM auth.users au
 LEFT JOIN profiles p ON au.id = p.id
 WHERE au.email = 'houssnair4@proton.me';
 
--- 2. Si l'utilisateur n'a pas de profil, le créer
-INSERT INTO profiles (id, first_name, last_name, email, role)
+-- 2. Vérifier les politiques RLS
+SELECT 'VÉRIFICATION POLITIQUES RLS:' as info;
 SELECT 
-  au.id,
-  COALESCE(au.raw_user_meta_data->>'first_name', 'Admin'),
-  COALESCE(au.raw_user_meta_data->>'last_name', 'ATMF'),
-  au.email,
-  'admin'
-FROM auth.users au
-WHERE au.email = 'houssnair4@proton.me'
-  AND NOT EXISTS (SELECT 1 FROM profiles WHERE id = au.id)
-ON CONFLICT (id) DO UPDATE SET
-  role = 'admin',
-  updated_at = CURRENT_TIMESTAMP;
+    schemaname,
+    tablename,
+    policyname,
+    permissive,
+    roles,
+    cmd,
+    qual,
+    with_check
+FROM pg_policies 
+WHERE schemaname = 'public'
+ORDER BY tablename, policyname;
 
--- 3. S'assurer que le rôle est admin
-UPDATE profiles
-SET role = 'admin', updated_at = CURRENT_TIMESTAMP
-WHERE email = 'houssnair4@proton.me';
+-- 3. Tester l'accès aux données
+SELECT 'TEST ACCÈS DONNÉES:' as info;
 
--- 4. Vérifier les permissions admin
-SELECT 'PERMISSIONS ADMIN:' as info;
-SELECT p.name as permission, p.description
-FROM permissions p
-JOIN role_permissions rp ON p.id = rp.permission_id
-WHERE rp.role = 'admin'
-ORDER BY p.name;
+-- Test accès profiles
+SELECT 'Profiles:' as table_name, COUNT(*) as count FROM profiles;
 
--- 5. Test des politiques RLS
-SELECT 'TEST POLITIQUES RLS:' as info;
+-- Test accès articles
+SELECT 'Articles:' as table_name, COUNT(*) as count FROM articles;
 
--- Tester l'accès aux profils
-SELECT 'Nombre de profils visibles:' as test, COUNT(*) as count FROM profiles;
+-- Test accès events
+SELECT 'Events:' as table_name, COUNT(*) as count FROM events;
 
--- Tester l'accès aux articles
-SELECT 'Nombre d''articles visibles:' as test, COUNT(*) as count FROM articles;
+-- 4. Vérifier les permissions
+SELECT 'VÉRIFICATION PERMISSIONS:' as info;
+SELECT COUNT(*) as total_permissions FROM permissions;
+SELECT COUNT(*) as admin_permissions 
+FROM role_permissions 
+WHERE role = 'admin';
 
--- Tester l'accès aux événements
-SELECT 'Nombre d''événements visibles:' as test, COUNT(*) as count FROM events;
-
--- 6. Vérifier l'état final
-SELECT 'ÉTAT FINAL:' as info;
+-- 5. Test de création d'un article (simulation)
+SELECT 'TEST CRÉATION ARTICLE:' as info;
 SELECT 
-  'Utilisateur: ' || email || ' | Rôle: ' || role || ' | ID: ' || id as status
-FROM profiles 
-WHERE email = 'houssnair4@proton.me'; 
+    CASE 
+        WHEN EXISTS (
+            SELECT 1 FROM profiles 
+            WHERE email = 'houssnair4@proton.me' 
+            AND role = 'admin'
+        ) 
+        THEN 'AUTORISÉ - Utilisateur admin trouvé'
+        ELSE 'REFUSÉ - Utilisateur admin non trouvé'
+    END as creation_status;
+
+-- 6. Résumé final
+SELECT 'RÉSUMÉ FINAL:' as info;
+SELECT 
+    (SELECT COUNT(*) FROM auth.users WHERE email = 'houssnair4@proton.me') as auth_user_exists,
+    (SELECT COUNT(*) FROM profiles WHERE email = 'houssnair4@proton.me' AND role = 'admin') as admin_profile_exists,
+    (SELECT COUNT(*) FROM pg_policies WHERE schemaname = 'public') as rls_policies_count,
+    (SELECT COUNT(*) FROM articles) as articles_count,
+    (SELECT COUNT(*) FROM events) as events_count; 

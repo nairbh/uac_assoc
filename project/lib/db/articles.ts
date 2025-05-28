@@ -109,6 +109,31 @@ export async function createArticle(articleData: Omit<Article, 'id' | 'created_a
   return data;
 }
 
+// Version simplifiée qui retourne un booléen pour l'admin
+export async function createArticleSimple(articleData: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<boolean> {
+  try {
+    // Si pas d'image fournie, utiliser l'image par défaut de la catégorie
+    const finalArticleData = {
+      ...articleData,
+      image_url: articleData.image_url || getDefaultImageForCategory(articleData.category)
+    };
+    
+    const { error } = await supabase
+      .from('articles')
+      .insert([finalArticleData]);
+
+    if (error) {
+      console.error('Error creating article:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error creating article:', error);
+    return false;
+  }
+}
+
 export async function updateArticle(id: number, articleData: Partial<Article>): Promise<Article | null> {
   // Si l'image est supprimée, utiliser l'image par défaut
   if (articleData.image_url === '' && articleData.category) {
