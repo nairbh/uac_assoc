@@ -6,6 +6,15 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { 
   Menu, 
@@ -18,15 +27,19 @@ import {
   Moon,
   Sun,
   Home,
-  ChevronDown
+  ChevronDown,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useAuth } from '@/hooks/useAuth';
 import React from 'react';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user, profile, signOut, isAdmin } = useAuth();
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -43,6 +56,17 @@ export function Navbar() {
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
+  // Vérifier si on est sur une page admin
+  const isAdminPage = pathname?.startsWith('/admin');
 
   const navLinks = [
     { name: 'Accueil', href: '/', icon: Home },
@@ -96,7 +120,7 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           <div className="flex items-center gap-1">
-            {navLinks.slice(0, 5).map((link) => (
+            {!isAdminPage && navLinks.slice(0, 5).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -117,50 +141,145 @@ export function Navbar() {
               </Link>
             ))}
             
-            <div 
-              className="relative inline-block"
-              onMouseEnter={() => {
-                if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-                setIsDropdownOpen(true);
-              }}
-              onMouseLeave={() => {
-                dropdownTimeout.current = setTimeout(() => setIsDropdownOpen(false), 150);
-              }}
-            >
-              <Button variant="ghost" className="flex items-center gap-1">
-                Plus
-                <ChevronDown size={16} className={`${isDropdownOpen ? 'rotate-180' : ''} transition-transform duration-200`} />
-              </Button>
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full w-48 origin-top-right bg-popover rounded-md shadow-lg p-2 z-50">
-                  {navLinks.slice(5).map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
-                    >
-                      <link.icon className="h-4 w-4" />
-                      {link.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+            {!isAdminPage && (
+              <div 
+                className="relative inline-block"
+                onMouseEnter={() => {
+                  if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+                  setIsDropdownOpen(true);
+                }}
+                onMouseLeave={() => {
+                  dropdownTimeout.current = setTimeout(() => setIsDropdownOpen(false), 150);
+                }}
+              >
+                <Button variant="ghost" className="flex items-center gap-1">
+                  Plus
+                  <ChevronDown size={16} className={`${isDropdownOpen ? 'rotate-180' : ''} transition-transform duration-200`} />
+                </Button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 top-full w-48 origin-top-right bg-popover rounded-md shadow-lg p-2 z-50">
+                    {navLinks.slice(5).map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
+                      >
+                        <link.icon className="h-4 w-4" />
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-2 ml-2">
-            <Button variant="outline" className="rounded-full" asChild>
-              <Link href="/signin">
-                <User className="mr-2 h-4 w-4" />
-                Connexion
-              </Link>
-            </Button>
-            <Button asChild className="bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90 hover:scale-105 transition-all rounded-full shadow-md">
-              <Link href="/donate">
-                <Heart className="mr-2 h-4 w-4" />
-                Faire un don
-              </Link>
-            </Button>
+            {user ? (
+              // Utilisateur connecté
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder-avatar.jpg" alt="Avatar" />
+                      <AvatarFallback>
+                        {profile?.first_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden lg:inline-block font-medium">
+                      {profile ? `${profile.first_name} ${profile.last_name}` : 'Utilisateur'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {profile ? `${profile.first_name} ${profile.last_name}` : 'Utilisateur'}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  {/* Liens selon le rôle utilisateur */}
+                  {profile?.role === 'admin' && !isAdminPage && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Administration complète
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  
+                  {profile?.role === 'editor' && !isAdminPage && !pathname?.startsWith('/moderator') && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/moderator">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Espace modération
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  
+                  {/* Lien vers espace membre pour tous */}
+                  {!isAdminPage && !pathname?.startsWith('/moderator') && !pathname?.startsWith('/member') && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/member">
+                          <User className="mr-2 h-4 w-4" />
+                          Mon espace
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  
+                  {/* Retour au site depuis l'admin ou modérateur */}
+                  {(isAdminPage || pathname?.startsWith('/moderator')) && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/">
+                          <Home className="mr-2 h-4 w-4" />
+                          Retour au site
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Déconnexion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              // Utilisateur non connecté
+              <>
+                <Button variant="outline" className="rounded-full" asChild>
+                  <Link href="/signin">
+                    <User className="mr-2 h-4 w-4" />
+                    Connexion
+                  </Link>
+                </Button>
+                {!isAdminPage && (
+                  <Button asChild className="bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90 hover:scale-105 transition-all rounded-full shadow-md">
+                    <Link href="/donate">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Faire un don
+                    </Link>
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </nav>
 
@@ -191,40 +310,105 @@ export function Navbar() {
                     ATMF Argenteuil
                   </span>
                 </Link>
-                <div className="grid gap-1">
-                  {navLinks.map((link, i) => (
-                    <motion.div
-                      key={link.href}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 * i }}
-                    >
-                      <Link
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${
-                          pathname === link.href ? 'bg-accent text-foreground font-medium' : ''
-                        }`}
+                
+                {!isAdminPage && (
+                  <div className="grid gap-1">
+                    {navLinks.map((link, i) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i }}
                       >
-                        <link.icon className="h-5 w-5" />
-                      {link.name}
-                    </Link>
-                    </motion.div>
-                  ))}
-                </div>
+                        <Link
+                        href={link.href}
+                        onClick={() => setIsOpen(false)}
+                          className={`flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${
+                            pathname === link.href ? 'bg-accent text-foreground font-medium' : ''
+                          }`}
+                        >
+                          <link.icon className="h-5 w-5" />
+                        {link.name}
+                      </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+                
                 <div className="grid gap-3 pt-4">
-                  <Button asChild className="h-12">
-                    <Link href="/signin" onClick={() => setIsOpen(false)}>
-                      <User className="mr-2 h-5 w-5" />
-                      Connexion
-                    </Link>
-                  </Button>
-                  <Button asChild className="h-12 bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90">
-                    <Link href="/donate" onClick={() => setIsOpen(false)}>
-                      <Heart className="mr-2 h-5 w-5" />
-                      Faire un don
-                    </Link>
-                  </Button>
+                  {user ? (
+                    // Menu mobile pour utilisateur connecté
+                    <>
+                      <div className="px-3 py-2 text-sm border-b">
+                        <p className="font-medium">
+                          {profile ? `${profile.first_name} ${profile.last_name}` : 'Utilisateur'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                      
+                      {/* Liens selon le rôle */}
+                      {profile?.role === 'admin' && !isAdminPage && (
+                        <Button variant="outline" asChild className="h-12">
+                          <Link href="/admin" onClick={() => setIsOpen(false)}>
+                            <Settings className="mr-2 h-5 w-5" />
+                            Administration complète
+                          </Link>
+                        </Button>
+                      )}
+                      
+                      {profile?.role === 'editor' && !isAdminPage && !pathname?.startsWith('/moderator') && (
+                        <Button variant="outline" asChild className="h-12">
+                          <Link href="/moderator" onClick={() => setIsOpen(false)}>
+                            <Settings className="mr-2 h-5 w-5" />
+                            Espace modération
+                          </Link>
+                        </Button>
+                      )}
+                      
+                      {/* Espace membre pour tous */}
+                      {!isAdminPage && !pathname?.startsWith('/moderator') && !pathname?.startsWith('/member') && (
+                        <Button variant="outline" asChild className="h-12">
+                          <Link href="/member" onClick={() => setIsOpen(false)}>
+                            <User className="mr-2 h-5 w-5" />
+                            Mon espace
+                          </Link>
+                        </Button>
+                      )}
+                      
+                      {/* Retour au site */}
+                      {(isAdminPage || pathname?.startsWith('/moderator')) && (
+                        <Button variant="outline" asChild className="h-12">
+                          <Link href="/" onClick={() => setIsOpen(false)}>
+                            <Home className="mr-2 h-5 w-5" />
+                            Retour au site
+                          </Link>
+                        </Button>
+                      )}
+                      
+                      <Button variant="outline" className="h-12" onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                        <LogOut className="mr-2 h-5 w-5" />
+                        Déconnexion
+                      </Button>
+                    </>
+                  ) : (
+                    // Menu mobile pour utilisateur non connecté
+                    <>
+                      <Button asChild className="h-12">
+                        <Link href="/signin" onClick={() => setIsOpen(false)}>
+                          <User className="mr-2 h-5 w-5" />
+                          Connexion
+                        </Link>
+                      </Button>
+                      {!isAdminPage && (
+                        <Button asChild className="h-12 bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90">
+                          <Link href="/donate" onClick={() => setIsOpen(false)}>
+                            <Heart className="mr-2 h-5 w-5" />
+                            Faire un don
+                          </Link>
+                        </Button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

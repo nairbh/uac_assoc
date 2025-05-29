@@ -31,7 +31,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
-import { ProtectedRoute } from '@/components/auth/protected-route';
+import { AdminGuard } from '@/components/auth/admin-guard';
 
 // Type pour un élément de menu
 interface NavItem {
@@ -106,12 +106,13 @@ export default function AdminLayout({
   );
 
   return (
-    <ProtectedRoute requiredRole="admin">
+    <AdminGuard>
       <div className="min-h-screen bg-muted/30">
         {/* Sidebar */}
         <aside
           className={cn(
-            "fixed left-0 top-0 z-40 h-screen bg-background border-r transition-all duration-300",
+            "fixed left-0 top-16 lg:top-20 z-40 bg-background border-r transition-all duration-300",
+            "h-[calc(100vh-4rem)] lg:h-[calc(100vh-5rem)]", // Ajuster la hauteur pour tenir compte de la navbar
             sidebarOpen ? "w-64" : "w-20"
           )}
         >
@@ -127,9 +128,11 @@ export default function AdminLayout({
                 <div className="bg-gradient-to-r from-red-600 to-rose-600 p-2 rounded-xl">
                   <h1 className="text-white font-bold text-xl">ATMF</h1>
                 </div>
-                <span className="font-bold">
-                  Admin Portal
-                </span>
+                {sidebarOpen && (
+                  <span className="font-bold">
+                    Admin Portal
+                  </span>
+                )}
               </div>
             </Link>
             <Button
@@ -185,50 +188,16 @@ export default function AdminLayout({
         {/* Main content */}
         <div
           className={cn(
-            "transition-all duration-300 min-h-screen",
+            "transition-all duration-300 min-h-screen pt-16 lg:pt-20", // Garder le padding pour la navbar principale
             sidebarOpen ? "md:ml-64" : "md:ml-20"
           )}
         >
-          {/* Top navigation */}
-          <header className="h-16 border-b bg-background/95 backdrop-blur sticky top-0 z-30 flex items-center px-6">
-            <Button variant="outline" size="icon" className="md:hidden mr-2" onClick={() => setSidebarOpen(!sidebarOpen)}>
-              <Menu className="h-5 w-5" />
-            </Button>
-            
-            <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-5 w-5" />
-              </Button>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 rounded-full">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="hidden md:inline-block font-medium">
-                      {profile ? `${profile.first_name} ${profile.last_name}` : 'Administrateur'}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profil</DropdownMenuItem>
-                  <DropdownMenuItem>Paramètres</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>Déconnexion</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-          
-          {/* Page content */}
-          <main className="p-6 md:p-8">
+          {/* Page content directement sans header supplémentaire */}
+          <main className="p-4 md:p-6">
             {children}
           </main>
         </div>
       </div>
-    </ProtectedRoute>
+    </AdminGuard>
   );
 }

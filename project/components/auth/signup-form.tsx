@@ -26,23 +26,52 @@ export function SignUpForm() {
     setError(null);
     setSuccess(false);
     
+    // Validation de base côté client
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
-      const { success, error } = await signUp(email, password, firstName, lastName);
+      console.log('Tentative d\'inscription...');
+      const result = await signUp(email, password, firstName, lastName);
+      console.log('Résultat de l\'inscription:', result);
 
-      if (error) {
-        throw error;
+      if (!result) {
+        setError('Erreur inattendue: aucune réponse reçue');
+        return;
       }
 
-      if (success) {
+      if (!result.success) {
+        // Gestion des erreurs spécifiques
+        let errorMessage = result.error || 'Une erreur s\'est produite lors de l\'inscription';
+        
+        if (errorMessage.includes('User already registered')) {
+          errorMessage = 'Un compte existe déjà avec cette adresse email. Essayez de vous connecter.';
+        } else if (errorMessage.includes('Invalid email')) {
+          errorMessage = 'Adresse email invalide. Veuillez vérifier le format.';
+        } else if (errorMessage.includes('Password')) {
+          errorMessage = 'Le mot de passe ne respecte pas les critères requis.';
+        }
+        
+        setError(errorMessage);
+      } else {
         setSuccess(true);
         setFirstName('');
         setLastName('');
         setEmail('');
         setPassword('');
+        console.log('Inscription réussie !');
+        
+        // Rediriger vers un espace membre normal, PAS vers admin
+        setTimeout(() => {
+          router.push('/member'); // Redirection vers l'espace membre
+        }, 2000);
       }
     } catch (err: any) {
-      setError(err.message || 'Une erreur s\'est produite lors de l\'inscription');
-      console.error('Erreur d\'inscription:', err);
+      console.error('Erreur lors de l\'inscription:', err);
+      setError('Une erreur inattendue s\'est produite. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
@@ -117,6 +146,17 @@ export function SignUpForm() {
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? 'Inscription...' : 'S\'inscrire'}
       </Button>
+      
+      <div className="mt-4 text-center text-sm space-y-2">
+        <p className="text-muted-foreground">
+          Après inscription, vérifiez votre email pour activer votre compte.
+        </p>
+        <div className="text-muted-foreground text-xs border-t border-border pt-4">
+          <p className="font-medium">Pour tester l'application :</p>
+          <p>Utilisez plutôt la connexion avec :</p>
+          <p className="font-mono bg-muted px-2 py-1 rounded">admin@atmf-argenteuil.org / admin</p>
+        </div>
+      </div>
     </form>
   );
 } 

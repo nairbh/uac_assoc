@@ -23,7 +23,7 @@ type AuthState = {
 
 type AuthContextType = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ success: boolean; error: string | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -191,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           first_name: 'Admin',
           last_name: 'ATMF',
           email: 'admin@atmf-argenteuil.org',
-          role: 'admin'
+          role: 'admin' as 'admin'
         };
         
         // Stocker l'utilisateur test dans localStorage
@@ -215,6 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Connexion normale avec Supabase
       console.log('Connexion avec Supabase...');
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -222,12 +223,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('Erreur de connexion Supabase:', error);
-        throw error;
+        
+        // Gestion spécifique des erreurs courantes
+        let errorMessage = error.message;
+        if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = 'Email ou mot de passe incorrect.';
+        } else if (error.message?.includes('Email not confirmed')) {
+          errorMessage = 'Veuillez confirmer votre email avant de vous connecter.';
+        } else if (error.message?.includes('signup disabled')) {
+          errorMessage = 'Les nouvelles inscriptions sont désactivées.';
+        }
+        
+        setState((prev) => ({ ...prev, error: errorMessage, isLoading: false }));
+        throw new Error(errorMessage);
       }
       
       console.log('Connexion Supabase réussie:', data);
       
-      // On ne met pas à jour l'état ici car l'écouteur onAuthStateChange le fera
+      // Si la connexion réussit mais l'utilisateur n'est pas confirmé
+      if (data.user && !data.user.email_confirmed_at) {
+        console.warn('Utilisateur connecté mais email non confirmé');
+        setState((prev) => ({ 
+          ...prev, 
+          error: 'Veuillez confirmer votre email. Vérifiez votre boîte mail.',
+          isLoading: false 
+        }));
+        return;
+      }
+      
+      // La gestion de l'état sera faite par l'écouteur onAuthStateChange
+      console.log('Attente de la mise à jour de l\'état par onAuthStateChange...');
+      
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       setState((prev) => ({ ...prev, error: error.message, isLoading: false }));
@@ -235,7 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
   
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string): Promise<{ success: boolean; error: string | null }> => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       
@@ -253,15 +279,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur d\'inscription Supabase:', error);
+        const errorMessage = error.message || 'Une erreur s\'est produite lors de l\'inscription';
+        setState((prev) => ({ ...prev, error: errorMessage, isLoading: false }));
+        return { success: false, error: errorMessage };
+      }
       
       console.log('Inscription réussie:', data);
       
       setState((prev) => ({ ...prev, isLoading: false }));
+      return { success: true, error: null };
     } catch (error: any) {
-      console.error('Erreur d\'inscription:', error);
-      setState((prev) => ({ ...prev, error: error.message, isLoading: false }));
-      throw error;
+      console.error('Erreur d\'inscription (catch):', error);
+      const errorMessage = error?.message || 'Une erreur inattendue s\'est produite lors de l\'inscription';
+      setState((prev) => ({ ...prev, error: errorMessage, isLoading: false }));
+      return { success: false, error: errorMessage };
     }
   };
   

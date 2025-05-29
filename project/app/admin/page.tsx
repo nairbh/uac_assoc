@@ -472,7 +472,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-background">
+    <div className="min-h-screen pt-4 bg-background">
       <div className="container py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
