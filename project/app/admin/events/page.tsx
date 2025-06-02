@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Event } from '@/types';
-import { getEvents, deleteEvent } from '@/lib/db/events';
+import { getAllEvents, deleteEvent } from '@/lib/db/events';
 import { toast } from 'sonner';
 
 export default function AdminEventsPage() {
@@ -45,7 +45,7 @@ export default function AdminEventsPage() {
   // Charger les événements
   const loadEvents = async () => {
     try {
-      const data = await getEvents();
+      const data = await getAllEvents();
       setEvents(data);
     } catch (error) {
       console.error('Erreur lors du chargement des événements:', error);
@@ -54,6 +54,11 @@ export default function AdminEventsPage() {
       setIsLoading(false);
     }
   };
+
+  // Charger les événements au montage du composant
+  useEffect(() => {
+    loadEvents();
+  }, []);
 
   // Filtrer les événements
   const filteredEvents = events.filter(event => {

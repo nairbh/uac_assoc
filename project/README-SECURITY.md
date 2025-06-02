@@ -162,4 +162,119 @@ Mot de passe : admin
 
 ---
 
-**🔐 SÉCURITÉ CRITIQUE ACTIVE** - Votre application est maintenant **ULTRA-SÉCURISÉE** ! 
+**🔐 SÉCURITÉ CRITIQUE ACTIVE** - Votre application est maintenant **ULTRA-SÉCURISÉE** !
+
+# Fonctionnalités de Sécurité et Gestion des Comptes
+
+## 🔐 Nouvelles Fonctionnalités Implémentées
+
+### 1. Suppression de Compte Utilisateur
+
+#### Fonctionnalité
+- **Localisation** : Espace membre (`/member`) → Onglet "Mon Profil" → Section "Gestion du compte"
+- **Sécurité** : Confirmation obligatoire en tapant "SUPPRIMER"
+- **Processus** : Suppression du profil puis de l'utilisateur (résout les contraintes de clé étrangère)
+
+#### API Endpoint
+- **Route** : `/api/delete-user`
+- **Méthode** : DELETE
+- **Gestion** : Suppression en cascade (profil → utilisateur auth)
+
+### 2. Amélioration des Mots de Passe
+
+#### Composant PasswordInput
+- **Visibilité** : Bouton œil pour afficher/masquer le mot de passe
+- **Validation** : Minimum 8 caractères (au lieu de 6)
+- **Indicateur de force** : Barre de progression et critères détaillés
+- **Critères évalués** :
+  - ✓ Au moins 8 caractères
+  - ✓ Une majuscule
+  - ✓ Une minuscule  
+  - ✓ Un chiffre
+  - ✓ Un caractère spécial
+
+#### Intégration
+- **Connexion** : Formulaire avec visibilité du mot de passe
+- **Inscription** : Validation renforcée + indicateur de force
+- **Validation temps réel** : Feedback immédiat sur la sécurité
+
+### 3. Résolution du Problème de Suppression
+
+#### Problème Initial
+```
+ERROR: update or delete on table "users" violates foreign key constraint "profiles_id_fkey" on table "profiles"
+```
+
+#### Solution Implémentée
+1. **Ordre de suppression** : Profil d'abord, puis utilisateur
+2. **Client admin** : Utilisation de la clé service_role pour les opérations privilégiées
+3. **Gestion d'erreurs** : Messages explicites et logging des erreurs
+
+## 🛠️ Configuration Requise
+
+### Variables d'Environnement (.env.local)
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Environment
+NODE_ENV=development
+```
+
+### Permissions Supabase
+- **Clé anon** : Opérations utilisateur standard
+- **Clé service_role** : Suppression d'utilisateurs (admin uniquement)
+
+## 🔒 Sécurité
+
+### Validation des Mots de Passe
+- **Minimum** : 8 caractères obligatoires
+- **Recommandé** : Combinaison majuscules, minuscules, chiffres, caractères spéciaux
+- **Feedback visuel** : Indicateur de force en temps réel
+
+### Suppression de Compte
+- **Confirmation** : Saisie manuelle de "SUPPRIMER"
+- **Irréversibilité** : Avertissements clairs
+- **Logging** : Traçabilité des suppressions
+- **Déconnexion automatique** : Après suppression réussie
+
+### Protection CSRF
+- **Validation d'origine** : Vérification des requêtes
+- **Headers sécurisés** : Protection contre les attaques
+
+## 📱 Interface Utilisateur
+
+### Espace Membre
+- **Section dédiée** : "Gestion du compte" avec zone dangereuse
+- **Design sécurisé** : Couleurs d'alerte (rouge) pour les actions critiques
+- **Confirmation progressive** : Étapes multiples pour éviter les erreurs
+
+### Formulaires d'Authentification
+- **UX améliorée** : Visibilité du mot de passe
+- **Validation temps réel** : Feedback immédiat
+- **Accessibilité** : Labels clairs et messages d'erreur explicites
+
+## 🚀 Utilisation
+
+### Pour l'Utilisateur
+1. **Connexion** : Utiliser l'œil pour voir le mot de passe
+2. **Inscription** : Suivre l'indicateur de force du mot de passe
+3. **Suppression** : Aller dans l'espace membre → Gestion du compte
+
+### Pour l'Administrateur
+- **Monitoring** : Logs de sécurité pour les suppressions
+- **Support** : Messages d'erreur détaillés pour le debugging
+
+## 🔧 Maintenance
+
+### Logs de Sécurité
+- **Suppressions** : Traçabilité complète
+- **Tentatives échouées** : Monitoring des erreurs
+- **Validation** : Suivi des tentatives d'injection
+
+### Base de Données
+- **Contraintes** : Respect des relations entre tables
+- **Nettoyage** : Suppression en cascade automatique
+- **Intégrité** : Vérification des données avant suppression 

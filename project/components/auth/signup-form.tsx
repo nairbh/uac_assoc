@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
+import PasswordInput from '@/components/PasswordInput';
 
 export function SignUpForm() {
   const router = useRouter();
@@ -26,9 +27,9 @@ export function SignUpForm() {
     setError(null);
     setSuccess(false);
     
-    // Validation de base côté client
-    if (password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
+    // Validation de base côté client - mise à jour pour 8 caractères minimum
+    if (password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères');
       setIsLoading(false);
       return;
     }
@@ -129,27 +130,26 @@ export function SignUpForm() {
         />
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="password">Mot de passe</Label>
-        <Input 
-          id="password" 
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <p className="text-xs text-muted-foreground">
-          Au moins 6 caractères
-        </p>
-      </div>
+      <PasswordInput
+        value={password}
+        onChange={setPassword}
+        label="Mot de passe"
+        placeholder="Choisissez un mot de passe sécurisé"
+        required
+        showStrength={true}
+      />
       
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={isLoading || password.length < 8}
+      >
         {isLoading ? 'Inscription...' : 'S\'inscrire'}
       </Button>
       
       <div className="mt-4 text-center text-sm space-y-2">
         <p className="text-muted-foreground">
-          Après inscription, vérifiez votre email pour activer votre compte.
+          Votre compte sera activé immédiatement après inscription.
         </p>
         <div className="text-muted-foreground text-xs border-t border-border pt-4">
           <p className="font-medium">Pour tester l'application :</p>

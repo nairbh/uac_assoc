@@ -39,15 +39,15 @@ export function HeroSection() {
               <div className="relative h-20 w-20">
                 <Image 
                   src="/images/logo.png" 
-                  alt="ATMF Logo" 
+                  alt="PACE ATMF Logo" 
                   width={80} 
                   height={80} 
-                  className="object-contain" 
+                  className="object-contain rounded-full" 
                 />
               </div>
               <div>
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-                  ATMF <span className="text-2xl md:text-4xl lg:text-5xl">Argenteuil</span>
+                  PACE ATMF <span className="text-2xl md:text-4xl lg:text-5xl">Argenteuil</span>
                 </h1>
                 <p className="text-lg text-red-200">Un homme, une voix</p>
               </div>
@@ -100,7 +100,7 @@ export function HeroSection() {
                 </div>
                 <div>
                   <h3 className="font-semibold">Les chibanis</h3>
-                  <p className="text-sm text-gray-200">Accompagnement des personnes âgées d'origine maghrébine dans leurs démarches, animation de rencontres et sorties culturelles.</p>
+                  <p className="text-sm text-gray-200">Accompagnement des personnes âgées d'origine immigrée réfugiée dans leurs démarches, animation de rencontres et sorties culturelles.</p>
                 </div>
               </motion.div>
               

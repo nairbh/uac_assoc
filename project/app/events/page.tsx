@@ -21,10 +21,10 @@ import {
   BookOpen,
   GraduationCap
 } from 'lucide-react';
-import { getEvents } from '@/lib/db/events';
+import { getPublishedEvents } from '@/lib/db/events';
 
 export default async function EventsPage() {
-  const events = await getEvents();
+  const events = await getPublishedEvents();
 
   return (
     <div className="container py-12">

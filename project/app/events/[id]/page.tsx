@@ -3,11 +3,11 @@ import { Calendar, Clock, MapPin, Users, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { getEventById, getEvents } from '@/lib/db/events';
+import { getEventById, getAllEvents } from '@/lib/db/events';
 import { EventRegistrationForm } from '@/components/events/event-registration-form';
 
 export async function generateStaticParams() {
-  const events = await getEvents();
+  const events = await getAllEvents();
   return events.map((event) => ({
     id: event.id.toString(),
   }));

@@ -98,22 +98,20 @@ export function Navbar() {
           >
             <Image 
               src="/images/logo.png" 
-              alt="ATMF Logo" 
+              alt="PACE ATMF Logo" 
               width={48} 
               height={48}
               style={{ width: 'auto', height: 'auto' }}
-              className="object-contain"
+              className="object-contain rounded-full"
             />
           </motion.div>
-          <div className="overflow-hidden">
-            <motion.span 
-              className="hidden font-bold sm:block text-lg"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              ATMF Argenteuil
-            </motion.span>
+          <div className="flex flex-col">
+            <span className="font-bold text-lg">
+              PACE ATMF Argenteuil
+            </span>
+            <span className="text-xs text-muted-foreground -mt-1">
+              Association citoyenne
+            </span>
           </div>
         </Link>
 
@@ -142,35 +140,35 @@ export function Navbar() {
             ))}
             
             {!isAdminPage && (
-              <div 
-                className="relative inline-block"
-                onMouseEnter={() => {
-                  if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-                  setIsDropdownOpen(true);
-                }}
-                onMouseLeave={() => {
-                  dropdownTimeout.current = setTimeout(() => setIsDropdownOpen(false), 150);
-                }}
-              >
-                <Button variant="ghost" className="flex items-center gap-1">
-                  Plus
-                  <ChevronDown size={16} className={`${isDropdownOpen ? 'rotate-180' : ''} transition-transform duration-200`} />
-                </Button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 top-full w-48 origin-top-right bg-popover rounded-md shadow-lg p-2 z-50">
-                    {navLinks.slice(5).map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
-                      >
-                        <link.icon className="h-4 w-4" />
-                        {link.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div 
+              className="relative inline-block"
+              onMouseEnter={() => {
+                if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+                setIsDropdownOpen(true);
+              }}
+              onMouseLeave={() => {
+                dropdownTimeout.current = setTimeout(() => setIsDropdownOpen(false), 150);
+              }}
+            >
+              <Button variant="ghost" className="flex items-center gap-1">
+                Plus
+                <ChevronDown size={16} className={`${isDropdownOpen ? 'rotate-180' : ''} transition-transform duration-200`} />
+              </Button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 top-full w-48 origin-top-right bg-popover rounded-md shadow-lg p-2 z-50">
+                  {navLinks.slice(5).map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
+                    >
+                      <link.icon className="h-4 w-4" />
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
             )}
           </div>
           
@@ -264,19 +262,19 @@ export function Navbar() {
             ) : (
               // Utilisateur non connecté
               <>
-                <Button variant="outline" className="rounded-full" asChild>
-                  <Link href="/signin">
-                    <User className="mr-2 h-4 w-4" />
-                    Connexion
-                  </Link>
-                </Button>
+            <Button variant="outline" className="rounded-full" asChild>
+              <Link href="/signin">
+                <User className="mr-2 h-4 w-4" />
+                Connexion
+              </Link>
+            </Button>
                 {!isAdminPage && (
-                  <Button asChild className="bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90 hover:scale-105 transition-all rounded-full shadow-md">
-                    <Link href="/donate">
-                      <Heart className="mr-2 h-4 w-4" />
-                      Faire un don
-                    </Link>
-                  </Button>
+            <Button asChild className="bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90 hover:scale-105 transition-all rounded-full shadow-md">
+              <Link href="/donate">
+                <Heart className="mr-2 h-4 w-4" />
+                Faire un don
+              </Link>
+            </Button>
                 )}
               </>
             )}
@@ -300,39 +298,39 @@ export function Navbar() {
                 >
                   <Image 
                     src="/images/logo.png" 
-                    alt="ATMF Logo" 
-                    width={40} 
-                    height={40}
+                    alt="PACE ATMF Logo" 
+                    width={32} 
+                    height={32}
                     style={{ width: 'auto', height: 'auto' }}
-                    className="object-contain" 
+                    className="object-contain rounded-full" 
                   />
-                  <span className="font-bold">
-                    ATMF Argenteuil
+                  <span className="font-semibold">
+                    PACE ATMF Argenteuil
                   </span>
                 </Link>
                 
                 {!isAdminPage && (
-                  <div className="grid gap-1">
-                    {navLinks.map((link, i) => (
-                      <motion.div
-                        key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 * i }}
+                <div className="grid gap-1">
+                  {navLinks.map((link, i) => (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * i }}
+                    >
+                      <Link
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                        className={`flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${
+                          pathname === link.href ? 'bg-accent text-foreground font-medium' : ''
+                        }`}
                       >
-                        <Link
-                        href={link.href}
-                        onClick={() => setIsOpen(false)}
-                          className={`flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${
-                            pathname === link.href ? 'bg-accent text-foreground font-medium' : ''
-                          }`}
-                        >
-                          <link.icon className="h-5 w-5" />
-                        {link.name}
-                      </Link>
-                      </motion.div>
-                    ))}
-                  </div>
+                        <link.icon className="h-5 w-5" />
+                      {link.name}
+                    </Link>
+                    </motion.div>
+                  ))}
+                </div>
                 )}
                 
                 <div className="grid gap-3 pt-4">
@@ -393,19 +391,19 @@ export function Navbar() {
                   ) : (
                     // Menu mobile pour utilisateur non connecté
                     <>
-                      <Button asChild className="h-12">
-                        <Link href="/signin" onClick={() => setIsOpen(false)}>
-                          <User className="mr-2 h-5 w-5" />
-                          Connexion
-                        </Link>
-                      </Button>
+                  <Button asChild className="h-12">
+                    <Link href="/signin" onClick={() => setIsOpen(false)}>
+                      <User className="mr-2 h-5 w-5" />
+                      Connexion
+                    </Link>
+                  </Button>
                       {!isAdminPage && (
-                        <Button asChild className="h-12 bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90">
-                          <Link href="/donate" onClick={() => setIsOpen(false)}>
-                            <Heart className="mr-2 h-5 w-5" />
-                            Faire un don
-                          </Link>
-                        </Button>
+                  <Button asChild className="h-12 bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90">
+                    <Link href="/donate" onClick={() => setIsOpen(false)}>
+                      <Heart className="mr-2 h-5 w-5" />
+                      Faire un don
+                    </Link>
+                  </Button>
                       )}
                     </>
                   )}

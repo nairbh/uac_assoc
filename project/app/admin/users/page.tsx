@@ -16,7 +16,8 @@ import {
   MessageSquare, 
   X,
   AlertTriangle,
-  Check
+  Check,
+  Trash2
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -244,6 +245,72 @@ export default function UsersManagement() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur ${userEmail} ?\n\nCette action est irréversible et supprimera :\n- Le profil utilisateur\n- Toutes ses données\n- Son accès à l'application`)) {
+      return;
+    }
+
+    try {
+      // Récupérer le token d'autorisation
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast({
+          title: "Erreur",
+          description: "Session expirée. Veuillez vous reconnecter.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: "Utilisateur supprimé avec succès",
+        });
+        // Recharger la liste des utilisateurs
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (!error) {
+          const formattedUsers = data.map(user => ({
+            id: user.id,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            fullName: `${user.first_name} ${user.last_name}`,
+            role: user.role as Role,
+            createdAt: new Date(user.created_at).toLocaleDateString('fr-FR'),
+          }));
+          setUsers(formattedUsers);
+        }
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Erreur",
+          description: error.error || "Erreur lors de la suppression",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erreur suppression utilisateur:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression de l'utilisateur",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -334,19 +401,34 @@ export default function UsersManagement() {
                       </TableCell>
                       <TableCell>{user.createdAt}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleEditRole(user)}
-                          disabled={isCurrentUser || isAdmin}
-                          className={cn(
-                            "flex items-center gap-1",
-                            (isCurrentUser || isAdmin) && "cursor-not-allowed opacity-50"
-                          )}
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                          Modifier
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleEditRole(user)}
+                            disabled={isCurrentUser || isAdmin}
+                            className={cn(
+                              "flex items-center gap-1",
+                              (isCurrentUser || isAdmin) && "cursor-not-allowed opacity-50"
+                            )}
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                            Modifier
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleDeleteUser(user.id, user.email)}
+                            disabled={isCurrentUser || isAdmin}
+                            className={cn(
+                              "flex items-center gap-1 text-red-600 hover:text-red-700",
+                              (isCurrentUser || isAdmin) && "cursor-not-allowed opacity-50"
+                            )}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Supprimer
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

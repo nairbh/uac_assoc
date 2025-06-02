@@ -1,0 +1,66 @@
+# Robots.txt pour PACE ATMF Argenteuil - SEO OPTIMISÉ
+# Domination des résultats de recherche "ATMF"
+
+User-agent: *
+Allow: /
+
+# Priorité maximale pour les pages importantes
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /events
+Allow: /donate
+Allow: /services
+Allow: /news
+Allow: /join
+
+# Bloquer les pages d'administration (ne pas indexer)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /member/
+Disallow: /moderator/
+Disallow: /_next/
+Disallow: /signin
+Disallow: /signup
+
+# Autoriser les images pour le SEO visuel
+Allow: /images/
+Allow: /favicon.ico
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.webp
+Allow: /*.svg
+
+# Sitemap XML - CRUCIAL pour Google
+Sitemap: https://atmf-argenteuil.org/sitemap.xml
+
+# Optimisation spéciale pour les bots Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Autoriser tous les bots de réseaux sociaux pour partage
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Bloquer les bots malveillants
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: / 

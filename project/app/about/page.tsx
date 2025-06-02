@@ -24,7 +24,7 @@ export default function AboutPage() {
       {/* En-tête de la page */}
       <div className="max-w-3xl mx-auto text-center space-y-4">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-          À propos de l'<span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600">ATMF Argenteuil</span>
+          À propos de <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600">PACE ATMF Argenteuil</span>
         </h1>
         <p className="text-xl text-muted-foreground">
           Une association engagée au service de la communauté d'Argenteuil
@@ -37,20 +37,23 @@ export default function AboutPage() {
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Notre Histoire</h2>
           <div className="space-y-4">
             <p>
-              L'ATMF (Association des Travailleurs Maghrébins de France) est une association qui puise ses racines dans les mouvements de libération nationale, dans les mouvements progressistes et de résistance, du mouvement ouvrier, et dans des luttes de l'immigration, et des droits humains au Maghreb.
+              L'Espace Associatif et Citoyen de Proximité (PACE ATMF) est une association créée officiellement en octobre 1985.
             </p>
             <p>
-              Créée initialement comme AMF (Association des Marocains en France) en 1961 à l'initiative de Mehdi Ben Barka, elle est devenue l'ATMF en 1982 suite à l'abrogation du décret qui interdisait aux immigrés de constituer des associations selon la loi de 1901.
+              Elle se définit comme citoyenne dans sa démarche, laïque et tolérante dans son esprit, démocratique dans son fonctionnement et indépendante dans sa réflexion.
             </p>
             <p>
-              En 2000, elle est devenue l'Association des Travailleurs Maghrébins de France. Le relais d'Argenteuil est une des associations locales actives qui œuvre pour l'intégration et le soutien des habitants d'Argenteuil.
+              Elle est ancrée au cœur du quartier Val d'Argent Sud, à Argenteuil.
+            </p>
+            <p>
+              Notre association est affiliée à un réseau national composé de vingt associations membres réparties dans toute l'Hexagone, dont le siège se trouve à Paris.
             </p>
           </div>
         </div>
         <div className="rounded-2xl overflow-hidden shadow-xl">
           <img 
             src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3540&q=80" 
-            alt="L'équipe de l'ATMF Argenteuil" 
+            alt="L'équipe de PACE ATMF Argenteuil" 
             className="w-full h-full object-cover aspect-[4/3]"
           />
         </div>
@@ -64,7 +67,7 @@ export default function AboutPage() {
           <div className="text-center space-y-4">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Nos Valeurs</h2>
             <p className="text-lg text-muted-foreground">
-              L'ATMF Argenteuil est guidée par des principes fondamentaux qui orientent toutes nos actions
+              PACE ATMF Argenteuil est guidée par des principes fondamentaux qui orientent toutes nos actions
             </p>
           </div>
           
@@ -76,7 +79,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold">Démocratique et indépendante</h3>
               <p className="text-muted-foreground">
-                Association laïque, démocratique et indépendante de tous pouvoirs. L'ATMF est porteuse de valeurs de fraternité, d'égalité et de liberté.
+                Association laïque, démocratique et indépendante de tous pouvoirs. PACE ATMF est porteuse de valeurs de fraternité, d'égalité et de liberté.
               </p>
             </div>
             
@@ -85,9 +88,9 @@ export default function AboutPage() {
               <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl w-fit shadow-md z-10">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold">Lutte contre l'exclusion</h3>
+              <h3 className="text-xl font-semibold">Oeuvrer contre l'exclusion</h3>
               <p className="text-muted-foreground">
-                L'ATMF est une association de lutte contre toutes les formes d'exclusion, de racisme, d'islamophobie, d'antisémitisme, de discriminations.
+                PACE ATMF est une association qui oeuvre contre toutes les formes d'exclusion, de racisme, d'islamophobie, d'antisémitisme, de discriminations.
               </p>
             </div>
             
@@ -98,7 +101,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold">Citoyenneté active</h3>
               <p className="text-muted-foreground">
-                Elle prône une citoyenneté active notamment pour les maghrébins de France et œuvre pour le respect des droits humains.
+                Elle prône une citoyenneté active notamment pour les immigrés réfugiés de France et œuvre pour le respect des droits humains.
               </p>
             </div>
             
@@ -109,7 +112,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold">Solidarité internationale</h3>
               <p className="text-muted-foreground">
-                L'ATMF lutte pour de nouveaux rapports Nord/Sud, basés sur la solidarité et pour un monde de paix entre les peuples.
+                PACE ATMF oeuvre pour de nouveaux rapports Nord/Sud, basés sur la solidarité et pour un monde de paix entre les peuples.
               </p>
             </div>
           </div>
@@ -121,7 +124,7 @@ export default function AboutPage() {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Nos Missions à Argenteuil</h2>
           <p className="text-lg text-muted-foreground">
-            L'ATMF Argenteuil propose une large gamme de services et d'activités pour les citoyens d'Argenteuil de toutes générations
+            PACE ATMF Argenteuil propose une large gamme de services et d'activités pour les citoyens d'Argenteuil de toutes générations
           </p>
         </div>
         
@@ -132,7 +135,7 @@ export default function AboutPage() {
             </div>
             <h3 className="text-xl font-semibold mb-2">Accompagnement scolaire</h3>
             <p className="text-muted-foreground mb-4">
-              Soutien aux élèves du primaire et du collège dans leur parcours scolaire.
+              Soutien aux élèves du collège au lycée dans leur parcours scolaire.
             </p>
             <p className="text-sm text-muted-foreground">
               <span className="font-semibold">Disponibilité :</span> Quelques heures par semaine
@@ -217,7 +220,7 @@ export default function AboutPage() {
             <div className="space-y-2 mt-4">
               <p className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-red-600 mt-0.5" /> 
-                <span>26 bd du Général Leclerc (ex bd Lénine), 95100 Argenteuil, France</span>
+                <span>26 Boulevard du Général Leclerc, 95 100 Argenteuil</span>
               </p>
               <p className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-red-600" /> 
@@ -240,7 +243,7 @@ export default function AboutPage() {
               style={{ border: 0 }} 
               allowFullScreen={true} 
               loading="lazy"
-              title="Carte ATMF Argenteuil"
+              title="Carte PACE ATMF Argenteuil"
             ></iframe>
           </div>
         </div>

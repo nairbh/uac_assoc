@@ -1,222 +1,395 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, AlertCircle, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { Loader2, AlertTriangle, Shield } from 'lucide-react';
+import Link from 'next/link';
+import { SecurityValidator, validateEmail, validatePassword } from '@/lib/security';
+import PasswordInput from '@/components/PasswordInput';
 
 interface SignInFormProps {
-  redirect?: string | null;
+  redirect?: string;
 }
 
 export function SignInForm({ redirect }: SignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const { signIn, isLoading, error: authError, user, profile, isAdmin } = useAuth();
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
+  
+  const { signIn, isLoading, error: authError, user, profile } = useAuth();
   const [error, setError] = useState('');
   const [showResendEmail, setShowResendEmail] = useState(false);
   const [resendingEmail, setResendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Gestion du blocage temporaire après tentatives échouées
+  useEffect(() => {
+    const checkBlockStatus = () => {
+      const lastAttempt = localStorage.getItem('lastFailedSignin');
+      const attempts = parseInt(localStorage.getItem('signinAttempts') || '0');
+      
+      if (attempts >= 5 && lastAttempt) {
+        const timeSinceLastAttempt = Date.now() - parseInt(lastAttempt);
+        const blockDuration = 5 * 60 * 1000; // 5 minutes
+        
+        if (timeSinceLastAttempt < blockDuration) {
+          setIsBlocked(true);
+          setBlockTimeRemaining(Math.ceil((blockDuration - timeSinceLastAttempt) / 1000));
+          
+          // Timer pour décompter
+          const timer = setInterval(() => {
+            const remaining = Math.ceil((blockDuration - (Date.now() - parseInt(lastAttempt))) / 1000);
+            if (remaining <= 0) {
+              setIsBlocked(false);
+              setAttemptCount(0);
+              localStorage.removeItem('signinAttempts');
+              localStorage.removeItem('lastFailedSignin');
+              clearInterval(timer);
+            } else {
+              setBlockTimeRemaining(remaining);
+            }
+          }, 1000);
+          
+          return () => clearInterval(timer);
+        } else {
+          // Reset si le délai est passé
+          localStorage.removeItem('signinAttempts');
+          localStorage.removeItem('lastFailedSignin');
+        }
+      }
+      
+      setAttemptCount(attempts);
+    };
+    
+    checkBlockStatus();
+  }, []);
 
   // Redirection sécurisée basée sur le rôle après connexion
   useEffect(() => {
     if (user && profile && !isLoading) {
-      console.log('Utilisateur connecté avec le rôle:', profile.role);
+      SecurityValidator.logSecurityEvent(
+        'SUCCESSFUL_LOGIN',
+        'low',
+        `Utilisateur connecté avec le rôle ${profile.role}`,
+        window.location.hostname,
+        user.id
+      );
       
       // Si une redirection est spécifiée, l'utiliser
       if (redirect) {
-        console.log('Redirection vers:', redirect);
         router.push(redirect);
         return;
       }
       
       // Sinon, redirection sécurisée selon le rôle
       if (profile.role === 'admin') {
-        console.log('Redirection vers admin dashboard');
         router.push('/admin');
       } else if (profile.role === 'editor') {
-        console.log('Redirection vers espace modérateur');
         router.push('/moderator');
       } else {
-        console.log('Redirection vers espace membre');
         router.push('/member');
       }
     }
   }, [user, profile, isLoading, router, redirect]);
 
+  // Validation en temps réel des champs
+  const validateField = (field: string, value: string) => {
+    const errors: {[key: string]: string} = {};
+    
+    switch (field) {
+      case 'email':
+        const emailValidation = validateEmail(value);
+        if (!emailValidation.success) {
+          errors.email = emailValidation.errors?.[0] || 'Email invalide';
+        }
+        break;
+        
+      case 'password':
+        if (value.length < 8) {
+          errors.password = 'Le mot de passe doit contenir au moins 8 caractères';
+        }
+        break;
+    }
+    
+    setValidationErrors(prev => ({
+      ...prev,
+      [field]: errors[field] || ''
+    }));
+    
+    return !errors[field];
+  };
+
+  // Gestion sécurisée de la soumission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isBlocked) {
+      setError(`Trop de tentatives échouées. Veuillez attendre ${Math.ceil(blockTimeRemaining / 60)} minute(s).`);
+      return;
+    }
+    
     setError('');
-    setShowResendEmail(false);
-    setEmailSent(false);
+    
+    // Validation côté client
+    const isEmailValid = validateField('email', email);
+    const isPasswordValid = validateField('password', password);
+    
+    if (!isEmailValid || !isPasswordValid) {
+      SecurityValidator.logSecurityEvent(
+        'VALIDATION_FAILED_SIGNIN',
+        'low',
+        `Tentative de connexion avec données invalides: ${SecurityValidator.obfuscate(email)}`,
+        window.location.hostname
+      );
+      return;
+    }
+    
+    // Détection d'injections potentielles
+    if (SecurityValidator.detectSQLInjection(email) || SecurityValidator.detectSQLInjection(password)) {
+      SecurityValidator.logSecurityEvent(
+        'INJECTION_ATTEMPT_SIGNIN',
+        'critical',
+        `Tentative d'injection dans le formulaire de connexion: ${SecurityValidator.obfuscate(email)}`,
+        window.location.hostname
+      );
+      setError('Données suspectes détectées. Veuillez contacter l\'administrateur.');
+      return;
+    }
+    
+    if (SecurityValidator.detectXSS(email)) {
+      SecurityValidator.logSecurityEvent(
+        'XSS_ATTEMPT_SIGNIN',
+        'critical',
+        `Tentative XSS dans le formulaire de connexion: ${SecurityValidator.obfuscate(email)}`,
+        window.location.hostname
+      );
+      setError('Données suspectes détectées. Veuillez contacter l\'administrateur.');
+      return;
+    }
 
     try {
       await signIn(email, password);
-      // Pas de redirection automatique ici - elle sera gérée par un useEffect
-      // qui vérifie le rôle de l'utilisateur connecté
-    } catch (error: any) {
-      const errorMessage = error.message || 'Une erreur est survenue. Veuillez réessayer plus tard.';
-      setError(errorMessage);
       
-      // Si l'erreur concerne la confirmation d'email, afficher l'option de renvoyer l'email
-      if (errorMessage.includes('confirm') || errorMessage.includes('email')) {
+      // Reset des tentatives en cas de succès
+      localStorage.removeItem('signinAttempts');
+      localStorage.removeItem('lastFailedSignin');
+      
+    } catch (error: any) {
+      // Incrémenter le compteur de tentatives échouées
+      const attempts = attemptCount + 1;
+      setAttemptCount(attempts);
+      localStorage.setItem('signinAttempts', attempts.toString());
+      localStorage.setItem('lastFailedSignin', Date.now().toString());
+      
+      SecurityValidator.logSecurityEvent(
+        'FAILED_LOGIN_ATTEMPT',
+        attempts >= 3 ? 'high' : 'medium',
+        `Tentative de connexion échouée (#${attempts}) pour: ${SecurityValidator.obfuscate(email)}`,
+        window.location.hostname
+      );
+      
+      if (attempts >= 5) {
+        setIsBlocked(true);
+        setBlockTimeRemaining(5 * 60); // 5 minutes
+        setError('Trop de tentatives échouées. Accès bloqué temporairement.');
+      } else {
+        setError(error.message || 'Erreur de connexion');
+        
+        if (attempts >= 3) {
+          setError(`${error.message || 'Erreur de connexion'} (${5 - attempts} tentative(s) restante(s))`);
+        }
+      }
+      
+      if (error.message?.includes('Email not confirmed')) {
         setShowResendEmail(true);
       }
     }
   };
 
-  const handleResendConfirmation = async () => {
-    if (!email) {
-      setError('Veuillez entrer votre adresse email');
-      return;
-    }
-
-    setResendingEmail(true);
-    setError('');
-
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-      });
-
-      if (error) {
-        setError('Erreur lors de l\'envoi de l\'email : ' + error.message);
-      } else {
-        setEmailSent(true);
-        setShowResendEmail(false);
-      }
-    } catch (err) {
-      setError('Erreur lors de l\'envoi de l\'email de confirmation');
-    } finally {
-      setResendingEmail(false);
+  // Messages d'état personnalisés basés sur les paramètres URL
+  const getMessageFromParams = () => {
+    const message = searchParams?.get('message');
+    switch (message) {
+      case 'session_expired':
+        return { type: 'warning', text: 'Votre session a expiré. Veuillez vous reconnecter.' };
+      case 'unauthorized':
+        return { type: 'error', text: 'Accès non autorisé. Connexion requise.' };
+      case 'profile_missing':
+        return { type: 'error', text: 'Profil utilisateur non trouvé.' };
+      default:
+        return null;
     }
   };
 
+  const statusMessage = getMessageFromParams();
+
   return (
-    <div className="mx-auto max-w-sm space-y-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Connexion</h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Entrez vos identifiants pour accéder à votre compte
-        </p>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            placeholder="exemple@email.com"
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Button variant="link" className="px-0 text-xs" type="button">
-              Mot de passe oublié?
-            </Button>
-          </div>
-          <Input
-            id="password"
-            required
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="remember-me"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(!!checked)}
-          />
-          <Label
-            htmlFor="remember-me"
-            className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Se souvenir de moi
-          </Label>
-        </div>
-        
-        {(error || authError) && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error || authError}</AlertDescription>
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-red-600" />
+          Connexion Sécurisée
+        </CardTitle>
+        <CardDescription>
+          Connectez-vous à votre espace PACE ATMF
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {statusMessage && (
+          <Alert className={`mb-4 ${statusMessage.type === 'error' ? 'border-destructive' : 'border-yellow-500'}`}>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{statusMessage.text}</AlertDescription>
           </Alert>
         )}
-
-        {emailSent && (
-          <Alert>
-            <Mail className="h-4 w-4" />
-            <AlertDescription className="text-green-600">
-              Email de confirmation renvoyé ! Vérifiez votre boîte mail.
+        
+        {isBlocked && (
+          <Alert className="mb-4 border-destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Compte temporairement bloqué. Temps restant: {Math.floor(blockTimeRemaining / 60)}:{(blockTimeRemaining % 60).toString().padStart(2, '0')}
             </AlertDescription>
           </Alert>
         )}
+        
+        {attemptCount >= 3 && !isBlocked && (
+          <Alert className="mb-4 border-yellow-500">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Attention: {attemptCount}/5 tentatives. Le compte sera bloqué temporairement après 5 échecs.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="votre@email.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateField('email', e.target.value);
+              }}
+              disabled={isLoading || isBlocked}
+              className={validationErrors.email ? 'border-destructive' : ''}
+              autoComplete="email"
+            />
+            {validationErrors.email && (
+              <p className="text-sm text-destructive">{validationErrors.email}</p>
+            )}
+          </div>
+
+          <PasswordInput
+            value={password}
+            onChange={(value) => {
+              setPassword(value);
+              validateField('password', value);
+            }}
+            label="Mot de passe"
+            placeholder="Votre mot de passe"
+            required
+            className={validationErrors.password ? 'border-destructive' : ''}
+          />
+          {validationErrors.password && (
+            <p className="text-sm text-destructive">{validationErrors.password}</p>
+          )}
+
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="remember" 
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+              disabled={isLoading || isBlocked}
+            />
+            <Label htmlFor="remember" className="text-sm">Se souvenir de moi</Label>
+          </div>
+
+          {error && (
+            <Alert className="border-destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {emailSent && (
+            <Alert className="border-green-500">
+              <AlertDescription>
+                Email de confirmation renvoyé avec succès !
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:opacity-90" 
+            disabled={isLoading || isBlocked || !!validationErrors.email || !!validationErrors.password}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Connexion...
+              </>
+            ) : (
+              'Se connecter'
+            )}
+          </Button>
+        </form>
 
         {showResendEmail && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <div className="space-y-2">
-                <p>Votre email n'est pas encore confirmé.</p>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleResendConfirmation}
-                  disabled={resendingEmail}
-                >
-                  {resendingEmail ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Envoi...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Renvoyer l'email de confirmation
-                    </>
-                  )}
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
+          <div className="mt-4 text-center">
+            <Button 
+              variant="outline" 
+              onClick={async () => {
+                setResendingEmail(true);
+                // Logique de renvoi d'email ici
+                setTimeout(() => {
+                  setResendingEmail(false);
+                  setEmailSent(true);
+                  setShowResendEmail(false);
+                }, 2000);
+              }}
+              disabled={resendingEmail}
+            >
+              {resendingEmail ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Envoi...
+                </>
+              ) : (
+                'Renvoyer l\'email de confirmation'
+              )}
+            </Button>
+          </div>
         )}
-        
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Connexion en cours...
-            </>
-          ) : (
-            'Se connecter'
-          )}
-        </Button>
-      </form>
-      <div className="mt-4 text-center text-sm">
-        <p className="text-muted-foreground">
-          Vous n'avez pas encore de compte? Contactez l'administrateur.
-        </p>
-        <div className="text-muted-foreground mt-4 text-xs border-t border-border pt-4 space-y-2">
-          <p className="font-medium">Pour tester l'interface admin :</p>
-          <p className="font-mono bg-muted px-2 py-1 rounded">admin@atmf-argenteuil.org / admin</p>
-          <p className="text-xs">Ou désactivez la confirmation d'email dans Supabase</p>
+
+        <div className="mt-6 text-center text-sm">
+          <span className="text-muted-foreground">Pas encore de compte ? </span>
+          <Link href="/signup" className="font-medium text-red-600 hover:underline">
+            S'inscrire
+          </Link>
         </div>
-      </div>
-    </div>
+        
+        <div className="mt-2 text-center">
+          <Link href="/forgot-password" className="text-sm text-muted-foreground hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 } 

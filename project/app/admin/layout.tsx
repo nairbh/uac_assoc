@@ -17,7 +17,8 @@ import {
   Bell,
   User,
   BarChart,
-  MessageCircle
+  MessageCircle,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -39,6 +40,7 @@ interface NavItem {
   href: string;
   icon: React.ElementType;
   permission?: string; // Permission requise pour afficher cet élément
+  badge?: string; // Badge optionnel pour attirer l'attention
 }
 
 export default function AdminLayout({
@@ -81,6 +83,12 @@ export default function AdminLayout({
       href: '/admin?tab=users',
       icon: Users,
       permission: 'manage_users'
+    },
+    {
+      title: 'Sécurité',
+      href: '/admin/security',
+      icon: Shield,
+      badge: 'NEW'
     },
     {
       title: 'Statistiques',
@@ -129,9 +137,9 @@ export default function AdminLayout({
                   <h1 className="text-white font-bold text-xl">ATMF</h1>
                 </div>
                 {sidebarOpen && (
-                  <span className="font-bold">
-                    Admin Portal
-                  </span>
+                <span className="font-bold">
+                  Admin Portal
+                </span>
                 )}
               </div>
             </Link>
@@ -155,7 +163,7 @@ export default function AdminLayout({
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors relative",
                     isActive(item.href) 
                       ? "bg-primary/10 text-primary font-medium" 
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -163,7 +171,19 @@ export default function AdminLayout({
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  {sidebarOpen && <span>{item.title}</span>}
+                  {sidebarOpen && (
+                    <div className="flex items-center justify-between w-full">
+                      <span>{item.title}</span>
+                      {item.badge && (
+                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {!sidebarOpen && item.badge && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                  )}
                 </Link>
               ))}
             </nav>

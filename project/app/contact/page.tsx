@@ -66,11 +66,10 @@ export default function ContactPage() {
                   <MapPin className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Adresse</h3>
+                  <h3 className="font-semibold text-lg">📍 Adresse</h3>
                   <p className="text-muted-foreground">
-                    13 Allée Henri Wallon<br />
-                    95100 Argenteuil<br />
-                    France
+                    26 Boulevard du Général Leclerc<br />
+                    95 100 Argenteuil
                   </p>
                 </div>
               </div>
@@ -80,9 +79,9 @@ export default function ContactPage() {
                   <Phone className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Téléphone</h3>
+                  <h3 className="font-semibold text-lg">📞 Téléphone</h3>
                   <p className="text-muted-foreground">
-                    01 39 82 81 48
+                    01.39.80.45.40
                   </p>
                 </div>
               </div>
@@ -92,15 +91,13 @@ export default function ContactPage() {
                   <Mail className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Email</h3>
-                  <p className="text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4 mr-2 inline-block text-red-600" />
-                    <span>Email: </span>
+                  <h3 className="font-semibold text-lg">📧 Email</h3>
+                  <p className="text-muted-foreground">
                     <a
-                      href="mailto:contact@atmf-argenteuil.org"
+                      href="mailto:atmfargent@gmail.com"
                       className="text-red-600 hover:underline"
                     >
-                      contact@atmf-argenteuil.org
+                      atmfargent@gmail.com
                     </a>
                   </p>
                 </div>
@@ -113,9 +110,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-lg">Horaires</h3>
                   <p className="text-muted-foreground">
-                    Lundi - Vendredi: 9h00 - 18h00<br />
-                    Samedi: 10h00 - 15h00<br />
-                    Dimanche: Fermé
+                    Lundi au vendredi: 10:00–12:30, 14:30–19:30<br />
+                    Fermé les weekends
                   </p>
                 </div>
               </div>
@@ -124,7 +120,7 @@ export default function ContactPage() {
           
           <div className="aspect-[16/10] w-full rounded-lg overflow-hidden">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2620.8366894940913!2d2.2372612!3d48.9490672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66f65d2ae43ed%3A0x10566c55b0eb6c36!2s13%20All.%20Henri%20Wallon%2C%2095100%20Argenteuil!5e0!3m2!1sfr!2sfr!4v1711642733371!5m2!1sfr!2sfr" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2621.9033345158473!2d2.2488978!3d48.9424356!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e6674c38b064e3%3A0xda0778de77e59ccf!2s26%20Bd%20du%20G%C3%A9n%C3%A9ral%20Leclerc%2C%2095100%20Argenteuil!5e0!3m2!1sfr!2sfr!4v1660000000000!5m2!1sfr!2sfr" 
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 

@@ -44,19 +44,19 @@ export function Footer() {
               >
                 <Image 
                   src="/images/logo.png" 
-                  alt="ATMF Logo" 
+                  alt="PACE ATMF Logo" 
                   width={48} 
                   height={48}
                   style={{ width: 'auto', height: 'auto' }}
-                  className="object-contain" 
+                  className="object-contain rounded-full" 
                 />
               </motion.div>
               <span className="font-bold text-lg">
-                ATMF Argenteuil
+                PACE ATMF Argenteuil
               </span>
             </Link>
             <p className="text-muted-foreground">
-              Association laïque, démocratique et indépendante, engagée contre le racisme et les discriminations, 
+              Association laïque, démocratique et indépendante, engagé contre toute formes de racisme et de descrimination, 
               proposant des services sociaux et activités culturelles à Argenteuil.
             </p>
             <div className="flex gap-3">
@@ -131,19 +131,19 @@ export function Footer() {
                 <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 p-2 rounded-lg">
                   <MapPin className="h-5 w-5 text-red-600" />
           </div>
-                <span className="text-muted-foreground">26 bd du Général Leclerc (ex bd Lénine), 95100 Argenteuil, France</span>
+                <span className="text-muted-foreground">26 Boulevard du Général Leclerc, 95 100 Argenteuil</span>
               </motion.li>
               <motion.li className="flex items-center gap-3" whileHover={{ x: 3 }}>
                 <div className="bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900 dark:to-rose-800 p-2 rounded-lg">
                   <Phone className="h-5 w-5 text-rose-600" />
                 </div>
-                <span className="text-muted-foreground">01 39 82 81 48</span>
+                <span className="text-muted-foreground">01.39.80.45.40</span>
               </motion.li>
               <motion.li className="flex items-center gap-3" whileHover={{ x: 3 }}>
                 <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 p-2 rounded-lg">
                   <Mail className="h-5 w-5 text-red-600" />
                 </div>
-                <span className="text-muted-foreground">contact@atmf-argenteuil.org</span>
+                <span className="text-muted-foreground">atmfargent@gmail.com</span>
               </motion.li>
               <motion.li className="flex items-center gap-3" whileHover={{ x: 3 }}>
                 <div className="bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900 dark:to-rose-800 p-2 rounded-lg">
@@ -191,7 +191,7 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-border/40">
           <div className="flex flex-col sm:flex-row justify-between gap-6">
             <div className="flex items-center gap-1 justify-center sm:justify-start">
-              <p className="text-muted-foreground text-sm">© {currentYear} ATMF Argenteuil.</p>
+              <p className="text-muted-foreground text-sm">© {currentYear} PACE ATMF Argenteuil.</p>
               <p className="text-muted-foreground text-sm flex items-center gap-1">
                 Fait avec <Heart className="h-3 w-3 text-red-500 inline fill-red-500" /> en France
               </p>

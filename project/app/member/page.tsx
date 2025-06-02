@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { getUserDonations, getUserDonationStats, type Donation, type DonationStats } from '@/lib/db/donations';
 import { useToast } from '@/components/ui/use-toast';
+import DeleteAccountButton from '@/components/DeleteAccountButton';
 
 export default function MemberDashboard() {
   const { profile, signOut, user } = useAuth();
@@ -282,6 +283,24 @@ export default function MemberDashboard() {
                       Retour au site
                     </Link>
                   </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Gestion du compte</CardTitle>
+                  <CardDescription>
+                    Paramètres et actions sur votre compte
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+                    <h4 className="font-medium text-red-800 mb-2">Zone dangereuse</h4>
+                    <p className="text-sm text-red-700 mb-4">
+                      La suppression de votre compte est définitive et irréversible.
+                    </p>
+                    {user?.id && <DeleteAccountButton userId={user.id} />}
+                  </div>
                 </CardContent>
               </Card>
 

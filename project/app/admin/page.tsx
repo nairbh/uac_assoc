@@ -194,6 +194,55 @@ export default function AdminDashboard() {
     setIsEditUserOpen(true);
   };
 
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur ${userEmail} ?\n\nCette action est irréversible et supprimera :\n- Le profil utilisateur\n- Toutes ses données\n- Son accès à l'application`)) {
+      return;
+    }
+
+    try {
+      // Récupérer le token d'autorisation
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast({
+          title: "Erreur",
+          description: "Session expirée. Veuillez vous reconnecter.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: "Utilisateur supprimé avec succès",
+        });
+        loadUsers(); // Recharger la liste des utilisateurs
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Erreur",
+          description: error.error || "Erreur lors de la suppression",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erreur suppression utilisateur:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression de l'utilisateur",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleUpdateUserRole = async () => {
     if (!selectedUser) return;
 
@@ -702,6 +751,14 @@ export default function AdminDashboard() {
                             className={user.banned ? 'text-green-600' : 'text-red-600'}
                           >
                             <Shield className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteUser(user.id, user.email)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>

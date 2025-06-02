@@ -53,15 +53,24 @@ export function AboutPreview() {
       >
         <motion.div className="space-y-6" variants={itemVariants}>
           <div className="inline-block rounded-full bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950 dark:to-rose-950 px-4 py-2 text-sm font-medium">
-            Notre Mission
+            Qui sommes nous
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600">
-              Solidarité
-            </span> et entraide à Argenteuil
+              PACE ATMF
+            </span> Argenteuil
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl">
-            L'ATMF Argenteuil est une association laïque, démocratique et indépendante qui lutte contre toutes les formes d'exclusion, de racisme et de discriminations. Au quotidien, nous accompagnons les habitants d'Argenteuil de toutes générations et origines.
+            L'Espace Associatif et Citoyen de Proximité (PACE ATMF) est une association créée officiellement en octobre 1985.
+          </p>
+          <p className="text-muted-foreground text-lg">
+            Elle se définit comme citoyenne dans sa démarche, laïque et tolérante dans son esprit, démocratique dans son fonctionnement et indépendante dans sa réflexion.
+          </p>
+          <p className="text-muted-foreground text-lg">
+            Elle est ancrée au cœur du quartier Val d'Argent Sud, à Argenteuil.
+          </p>
+          <p className="text-muted-foreground text-lg">
+            Notre association est affiliée à un réseau national composé de vingt associations membres réparties dans toute l'Hexagone, dont le siège se trouve à Paris.
           </p>
           
           <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border-l-4 border-red-600 my-4">
@@ -97,7 +106,7 @@ export function AboutPreview() {
               <div className="space-y-1">
                 <h3 className="font-semibold text-lg group-hover:text-red-600 transition-colors">Accompagnement scolaire</h3>
                 <p className="text-muted-foreground">
-                  Soutien aux élèves du primaire et des collèges, avec plus de 50 jeunes accompagnés chaque année.
+                  Soutien aux élèves du collège au lycée, avec plus de 50 jeunes accompagnés chaque année.
                 </p>
               </div>
             </motion.div>
@@ -129,7 +138,7 @@ export function AboutPreview() {
               <div className="space-y-1">
                 <h3 className="font-semibold text-lg group-hover:text-red-600 transition-colors">Soutien aux chibanis</h3>
                 <p className="text-muted-foreground">
-                  Accompagnement des personnes âgées d'origine maghrébine dans leurs démarches administratives et organisation de rencontres conviviales.
+                  Accompagnement des personnes âgées d'origine immigrée réfugiée dans leurs démarches administratives et organisation de rencontres conviviales.
                 </p>
               </div>
             </motion.div>
