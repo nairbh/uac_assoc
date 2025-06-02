@@ -474,13 +474,15 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin') || pathname.startsWith('/moderator')) {
     const response = NextResponse.next();
     
-    // Headers de sécurité renforcés pour les zones d'administration
-    response.headers.set('X-Frame-Options', 'DENY');
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('Referrer-Policy', 'no-referrer');
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
+    if (!isDevelopment()) {
+      // Headers de sécurité renforcés pour les zones d'administration (production seulement)
+      response.headers.set('X-Frame-Options', 'DENY');
+      response.headers.set('X-Content-Type-Options', 'nosniff');
+      response.headers.set('Referrer-Policy', 'no-referrer');
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+    }
     
     return response;
   }
