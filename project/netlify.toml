@@ -1,13 +1,12 @@
 [build]
-  command = "npm run build"
-  publish = ".next"
-  base = "."
+  command = "npm install && npm run build"
+  publish = "project/.next"
+  base = "project"
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_FLAGS = "--version"
 
-# Plugin Next.js pour Netlify
+# Plugin Next.js pour Netlify (version mise à jour)
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
@@ -93,4 +92,4 @@
 
 # Configuration des fonctions (si nécessaire)
 [functions]
-  directory = "netlify/functions" 
+  directory = "project/netlify/functions" 

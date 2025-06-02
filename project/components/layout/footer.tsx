@@ -55,9 +55,9 @@ export function Footer() {
                 PACE ATMF Argenteuil
               </span>
             </Link>
-            <p className="text-muted-foreground">
-              Association laïque, démocratique et indépendante, engagé contre toute formes de racisme et de descrimination, 
-              proposant des services sociaux et activités culturelles à Argenteuil.
+            <p className="text-sm text-muted-foreground">
+              Association laïque, démocratique et indépendante, engagée contre toute forme de racisme et discrimination,
+              au service des habitants d'Argenteuil.
             </p>
             <div className="flex gap-3">
               <motion.div whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 400 }}>

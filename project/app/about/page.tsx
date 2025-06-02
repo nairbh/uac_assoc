@@ -79,7 +79,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold">Démocratique et indépendante</h3>
               <p className="text-muted-foreground">
-                Association laïque, démocratique et indépendante de tous pouvoirs. PACE ATMF est porteuse de valeurs de fraternité, d'égalité et de liberté.
+                Association laïque, démocratique et indépendante de tous pouvoirs. PACE ATMF est porteuse de valeurs de fraternité, d'égalité et de liberté, engagée contre toute forme de racisme et discrimination.
               </p>
             </div>
             

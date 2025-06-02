@@ -53,8 +53,8 @@ export function HeroSection() {
               </div>
             </div>
             
-            <p className="text-xl md:text-2xl opacity-95 font-light">
-              Association laïque, démocratique et indépendante, engagée contre le racisme et les discriminations, au service des habitants d'Argenteuil.
+            <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
+              Association laïque, démocratique et indépendante, engagée contre toute forme de racisme et discrimination, au service des habitants d'Argenteuil.
             </p>
             
             <motion.div 
