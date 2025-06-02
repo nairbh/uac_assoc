@@ -10,6 +10,9 @@ type UserProfile = {
   last_name: string;
   email: string;
   role: 'admin' | 'member' | 'editor';
+  created_at?: string;
+  updated_at?: string;
+  banned?: boolean;
 };
 
 type AuthState = {
@@ -266,6 +269,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       
       console.log('Tentative d\'inscription pour:', email);
+      console.log('Données reçues:', { firstName, lastName, email });
       
       // Inscription avec Supabase
       const { data, error } = await supabase.auth.signUp({
@@ -287,6 +291,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       console.log('Inscription réussie:', data);
+      
+      // Si l'utilisateur est créé, mettre à jour ou créer son profil
+      if (data.user) {
+        console.log('Mise à jour du profil pour:', data.user.id);
+        console.log('Valeurs à sauvegarder:', { 
+          id: data.user.id,
+          first_name: firstName, 
+          last_name: lastName, 
+          email: email 
+        });
+        
+        // Utiliser upsert pour créer ou mettre à jour le profil
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            role: 'member'
+          }, {
+            onConflict: 'id'
+          })
+          .select()
+          .single();
+          
+        if (profileError) {
+          console.error('Erreur mise à jour profil avec upsert:', profileError);
+          // Essayer avec un UPDATE direct
+          const { data: updateData, error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              first_name: firstName,
+              last_name: lastName,
+              email: email
+            })
+            .eq('id', data.user.id)
+            .select()
+            .single();
+            
+          if (updateError) {
+            console.error('Erreur update profil:', updateError);
+          } else {
+            console.log('Profil mis à jour avec succès via UPDATE:', updateData);
+          }
+        } else {
+          console.log('Profil créé/mis à jour avec succès via UPSERT:', profileData);
+        }
+
+        // Attendre un peu et recharger le profil pour s'assurer qu'il est à jour
+        setTimeout(async () => {
+          if (data.user) {
+            const { data: refreshedProfile, error: refreshError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+              
+            if (!refreshError && refreshedProfile) {
+              console.log('Profil rechargé après inscription:', refreshedProfile);
+              setState((prev) => ({
+                ...prev,
+                profile: refreshedProfile,
+                isAdmin: refreshedProfile.role === 'admin'
+              }));
+            }
+          }
+        }, 1000);
+      }
       
       setState((prev) => ({ ...prev, isLoading: false }));
       return { success: true, error: null };

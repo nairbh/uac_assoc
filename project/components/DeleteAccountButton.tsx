@@ -1,27 +1,46 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Trash2, AlertTriangle, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { Trash2, AlertTriangle } from 'lucide-react';
 
-interface DeleteAccountButtonProps {
-  userId: string;
-}
-
-export default function DeleteAccountButton({ userId }: DeleteAccountButtonProps) {
-  const [showConfirmation, setShowConfirmation] = useState(false);
+export function DeleteAccountButton() {
+  const { user, signOut } = useAuth();
+  const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmText, setConfirmText] = useState('');
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleDeleteAccount = async () => {
+  const handleDelete = async () => {
     if (confirmText !== 'SUPPRIMER') {
-      alert('Veuillez taper "SUPPRIMER" pour confirmer');
+      setError('Veuillez taper exactement "SUPPRIMER" pour confirmer');
+      return;
+    }
+
+    if (!user) {
+      setError('Aucun utilisateur connecté');
       return;
     }
 
     setIsDeleting(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/delete-user', {
@@ -29,88 +48,129 @@ export default function DeleteAccountButton({ userId }: DeleteAccountButtonProps
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({
+          userId: user.id,
+        }),
       });
 
-      if (response.ok) {
-        // Déconnexion de l'utilisateur
-        await supabase.auth.signOut();
-        alert('Votre compte a été supprimé avec succès');
-        router.push('/');
-      } else {
-        const error = await response.json();
-        alert(`Erreur: ${error.error}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la suppression');
       }
-    } catch (error) {
-      console.error('Erreur suppression compte:', error);
-      alert('Une erreur est survenue lors de la suppression');
+
+      // Déconnexion et redirection
+      await signOut();
+      router.push('/');
+      
+    } catch (error: any) {
+      console.error('Erreur suppression:', error);
+      setError(error.message || 'Une erreur est survenue');
     } finally {
       setIsDeleting(false);
-      setShowConfirmation(false);
-      setConfirmText('');
     }
   };
 
-  if (!showConfirmation) {
-    return (
-      <button
-        onClick={() => setShowConfirmation(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-      >
-        <Trash2 size={16} />
-        Supprimer mon compte
-      </button>
-    );
-  }
-
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-      <div className="flex items-center gap-2 text-red-800 mb-4">
-        <AlertTriangle size={20} />
-        <h3 className="font-semibold">Suppression définitive du compte</h3>
-      </div>
-      
-      <div className="text-red-700 mb-4">
-        <p className="mb-2">⚠️ Cette action est irréversible !</p>
-        <p className="mb-2">En supprimant votre compte :</p>
-        <ul className="list-disc list-inside ml-4 space-y-1">
-          <li>Toutes vos données personnelles seront supprimées</li>
-          <li>Vous perdrez l'accès à votre profil</li>
-          <li>Cette action ne peut pas être annulée</li>
-        </ul>
-      </div>
+    <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-6">
+      <div className="flex items-start gap-4">
+        <div className="bg-red-100 p-3 rounded-full">
+          <Shield className="h-6 w-6 text-red-600" />
+        </div>
+        
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-red-900 mb-2">
+            Suppression du compte
+          </h3>
+          <p className="text-red-700 text-sm mb-4">
+            Cette action est irréversible. Toutes vos données seront définitivement supprimées.
+          </p>
+          
+          <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Supprimer mon compte
+              </Button>
+            </AlertDialogTrigger>
+            
+            <AlertDialogContent className="max-w-md">
+              <AlertDialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-red-100 p-2 rounded-full">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <AlertDialogTitle className="text-red-900">
+                    Confirmer la suppression
+                  </AlertDialogTitle>
+                </div>
+                
+                <AlertDialogDescription className="text-gray-600">
+                  Cette action supprimera définitivement votre compte et toutes vos données. 
+                  Cette opération ne peut pas être annulée.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-red-800 mb-2">
-          Pour confirmer, tapez "SUPPRIMER" ci-dessous :
-        </label>
-        <input
-          type="text"
-          value={confirmText}
-          onChange={(e) => setConfirmText(e.target.value)}
-          className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          placeholder="Tapez SUPPRIMER"
-        />
-      </div>
+              <div className="space-y-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => {
-            setShowConfirmation(false);
-            setConfirmText('');
-          }}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-          disabled={isDeleting}
-        >
-          Annuler
-        </button>
-        <button
-          onClick={handleDeleteAccount}
-          disabled={isDeleting || confirmText !== 'SUPPRIMER'}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {isDeleting ? 'Suppression...' : 'Confirmer la suppression'}
-        </button>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm" className="text-sm font-medium">
+                    Tapez <span className="font-bold text-red-600">&quot;SUPPRIMER&quot;</span> pour confirmer :
+                  </Label>
+                  <Input
+                    id="confirm"
+                    value={confirmText}
+                    onChange={(e) => {
+                      setConfirmText(e.target.value);
+                      setError(null);
+                    }}
+                    placeholder="SUPPRIMER"
+                    className="font-mono"
+                  />
+                </div>
+              </div>
+
+              <AlertDialogFooter className="gap-2">
+                <AlertDialogCancel 
+                  onClick={() => {
+                    setConfirmText('');
+                    setError(null);
+                  }}
+                  className="flex-1"
+                >
+                  Annuler
+                </AlertDialogCancel>
+                
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting || confirmText !== 'SUPPRIMER'}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Suppression...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Supprimer définitivement
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );

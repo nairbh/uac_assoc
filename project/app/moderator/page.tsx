@@ -36,6 +36,7 @@ import {
 import { Article, getAllArticles, deleteArticle } from '@/lib/db/articles';
 import { Event, getAllEvents, deleteEvent } from '@/lib/db/events';
 import { useToast } from '@/components/ui/use-toast';
+import { formatUserName } from '@/lib/utils';
 
 export default function ModeratorDashboard() {
   const { profile, signOut } = useAuth();
@@ -197,7 +198,7 @@ export default function ModeratorDashboard() {
             <div>
               <h1 className="text-3xl font-bold">Espace Modération</h1>
               <p className="text-muted-foreground">
-                Bienvenue {profile?.first_name} {profile?.last_name}
+                Bienvenue {formatUserName(profile?.first_name, profile?.last_name, profile?.email)}
               </p>
             </div>
             <div className="flex items-center gap-4">

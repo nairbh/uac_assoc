@@ -377,17 +377,8 @@ export function SignInForm({ redirect }: SignInFormProps) {
           </div>
         )}
 
-        <div className="mt-6 text-center text-sm">
-          <span className="text-muted-foreground">Pas encore de compte ? </span>
-          <Link href="/signup" className="font-medium text-red-600 hover:underline">
-            S'inscrire
-          </Link>
-        </div>
-        
-        <div className="mt-2 text-center">
-          <Link href="/forgot-password" className="text-sm text-muted-foreground hover:underline">
-            Mot de passe oublié ?
-          </Link>
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          Vous pouvez créer un compte en utilisant l'onglet "Inscription" ci-dessus
         </div>
       </CardContent>
     </Card>

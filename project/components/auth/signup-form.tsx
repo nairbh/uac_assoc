@@ -27,7 +27,13 @@ export function SignUpForm() {
     setError(null);
     setSuccess(false);
     
-    // Validation de base côté client - mise à jour pour 8 caractères minimum
+    // Validation de base côté client
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('Le prénom et le nom sont obligatoires');
+      setIsLoading(false);
+      return;
+    }
+    
     if (password.length < 8) {
       setError('Le mot de passe doit contenir au moins 8 caractères');
       setIsLoading(false);
@@ -36,7 +42,8 @@ export function SignUpForm() {
     
     try {
       console.log('Tentative d\'inscription...');
-      const result = await signUp(email, password, firstName, lastName);
+      console.log('Données formulaire:', { firstName: firstName.trim(), lastName: lastName.trim(), email });
+      const result = await signUp(email, password, firstName.trim(), lastName.trim());
       console.log('Résultat de l\'inscription:', result);
 
       if (!result) {
@@ -91,7 +98,7 @@ export function SignUpForm() {
         <Alert>
           <AlertCircle className="h-4 w-4 text-green-500" />
           <AlertDescription className="text-green-500">
-            Inscription réussie! Vérifiez votre email pour confirmer votre compte.
+            Inscription réussie ! Redirection vers votre espace membre...
           </AlertDescription>
         </Alert>
       )}
@@ -142,20 +149,15 @@ export function SignUpForm() {
       <Button 
         type="submit" 
         className="w-full" 
-        disabled={isLoading || password.length < 8}
+        disabled={isLoading || password.length < 8 || !firstName.trim() || !lastName.trim() || !email.trim()}
       >
         {isLoading ? 'Inscription...' : 'S\'inscrire'}
       </Button>
       
       <div className="mt-4 text-center text-sm space-y-2">
         <p className="text-muted-foreground">
-          Votre compte sera activé immédiatement après inscription.
+          Votre compte sera créé immédiatement après inscription.
         </p>
-        <div className="text-muted-foreground text-xs border-t border-border pt-4">
-          <p className="font-medium">Pour tester l'application :</p>
-          <p>Utilisez plutôt la connexion avec :</p>
-          <p className="font-mono bg-muted px-2 py-1 rounded">admin@atmf-argenteuil.org / admin</p>
-        </div>
       </div>
     </form>
   );

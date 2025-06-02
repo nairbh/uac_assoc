@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
     // Optimisations de performance
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
