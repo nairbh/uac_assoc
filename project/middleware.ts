@@ -242,12 +242,31 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const now = Date.now();
   
-  // En développement, ignorer certaines routes Next.js automatiques
+  // En développement, ignorer les ressources Next.js et statiques
   if (isDevelopment()) {
-    const ignoredPaths = ['/_next', '/__nextjs', '/favicon.ico', '/_dev', '/api/ping'];
-    if (ignoredPaths.some(path => pathname.startsWith(path))) {
+    const devIgnoredPaths = [
+      '/_next',
+      '/__nextjs', 
+      '/favicon.ico', 
+      '/_dev',
+      '/api/ping',
+      '/_next/static',
+      '/_next/webpack',
+      '/_next/image'
+    ];
+    
+    if (devIgnoredPaths.some(path => pathname.startsWith(path))) {
       return NextResponse.next();
     }
+  }
+  
+  // En production, ignorer seulement les ressources essentielles
+  const staticPaths = ['/_next/static', '/_next/image', '/favicon.ico', '/images'];
+  if (staticPaths.some(path => pathname.startsWith(path))) {
+    const response = NextResponse.next();
+    // Headers minimaux pour les ressources statiques
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    return response;
   }
   
   // Log de toutes les requêtes vers les routes protégées (sauf en dev pour réduire le bruit)
@@ -469,26 +488,33 @@ export function middleware(request: NextRequest) {
   // 12. Headers de sécurité globaux
   const response = NextResponse.next();
   
-  // Headers de sécurité existants plus quelques nouveaux
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // Headers de sécurité adaptatifs selon l'environnement
+  if (isDevelopment()) {
+    // Headers minimaux en développement pour éviter de bloquer Next.js
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  } else {
+    // Headers de sécurité complets en production
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    // CSP plus strict en production
+    response.headers.set('Content-Security-Policy', 
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co; " +
+      "frame-ancestors 'none';"
+    );
+  }
   
-  // Protection contre le clickjacking
-  response.headers.set('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co; " +
-    "frame-ancestors 'none';"
-  );
-  
-  // Anti-caching pour les pages sensibles
-  if (pathname.includes('/admin') || pathname.includes('/member')) {
+  // Anti-caching pour les pages sensibles (seulement en production)
+  if (!isDevelopment() && (pathname.includes('/admin') || pathname.includes('/member'))) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
@@ -518,9 +544,9 @@ export function middleware(request: NextRequest) {
 // Configuration du matcher pour appliquer le middleware
 export const config = {
   matcher: [
-    // Appliquer à toutes les routes sauf les assets statiques
-    '/((?!_next/static|_next/image|favicon.ico|public|images).*)',
-    // API routes
+    // Appliquer à toutes les routes sauf les assets statiques Next.js
+    '/((?!_next/static|_next/image|_next/webpack|favicon.ico|public|images).*)',
+    // API routes (mais pas les assets)
     '/api/:path*',
     // Protected routes
     '/admin/:path*',

@@ -123,7 +123,7 @@ export function MembershipForm() {
             </Label>
             <Textarea 
               id="motivations" 
-              placeholder="Partagez-nous vos motivations pour rejoindre l'ATMF Argenteuil" 
+              placeholder="Partagez-nous vos motivations pour rejoindre l'Union des Algériens de France" 
               rows={4}
             />
           </div>
