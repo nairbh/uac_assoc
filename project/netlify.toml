@@ -4,20 +4,39 @@
   base = "project"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_ENV = "production"
+  # Optimisations de build sécurisé
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Force la production même si Netlify ne l'a pas détecté
+  CI = "true"
 
 # Plugin Next.js pour Netlify (version mise à jour)
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Redirections de sécurité
+# Protection contre l'accès aux fichiers sensibles
 [[redirects]]
-  from = "/.env"
+  from = "/.env*"
+  to = "/404"
+  status = 404
+
+[[redirects]]
+  from = "/package*.json"
   to = "/404"
   status = 404
 
 [[redirects]]
   from = "/.git/*"
+  to = "/404"
+  status = 404
+
+[[redirects]]
+  from = "/node_modules/*"
+  to = "/404"
+  status = 404
+
+[[redirects]]
+  from = "/*.log"
   to = "/404"
   status = 404
 
@@ -31,7 +50,12 @@
   to = "/404"
   status = 404
 
-# Headers de sécurité pour toutes les pages
+[[redirects]]
+  from = "/adminer*"
+  to = "/404"
+  status = 404
+
+# Headers de sécurité renforcés
 [[headers]]
   for = "/*"
   [headers.values]
@@ -41,16 +65,19 @@
     Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(self)"
     X-XSS-Protection = "1; mode=block"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';"
+    # Cache Control pour empêcher la mise en cache du code source
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Headers spéciaux pour les API
+# Headers spéciaux pour les API (sécurité maximale)
 [[headers]]
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate"
     Pragma = "no-cache"
     Expires = "0"
+    X-Robots-Tag = "noindex, nofollow"
 
-# Headers pour les pages admin (non-indexées)
+# Headers pour les pages admin (non-indexées et non-cachées)
 [[headers]]
   for = "/admin/*"
   [headers.values]
@@ -69,9 +96,14 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Headers pour les assets statiques (cache long)
+# Headers pour les assets statiques (cache optimisé)
 [[headers]]
   for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

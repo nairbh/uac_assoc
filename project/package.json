@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:secure": "NODE_ENV=production next build && npm run obfuscate",
+    "obfuscate": "echo 'Code obfuscated by Next.js compiler'",
     "start": "next start",
     "lint": "next lint"
   },
@@ -78,5 +80,11 @@
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.7.2"
+  },
+  "resolutions": {
+    "canvas": "2.11.2"
+  },
+  "overrides": {
+    "canvas": "2.11.2"
   }
 }

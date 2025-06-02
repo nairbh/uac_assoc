@@ -57,7 +57,7 @@ export function Footer() {
             </Link>
             <p className="text-sm text-muted-foreground">
               Association laïque, démocratique et indépendante, engagée contre toute forme de racisme et discrimination,
-              au service des habitants d'Argenteuil.
+              au service des habitants d&apos;Argenteuil.
             </p>
             <div className="flex gap-3">
               <motion.div whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 400 }}>
