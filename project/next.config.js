@@ -24,8 +24,6 @@ const nextConfig = {
       removeConsole: {
         exclude: ['error', 'warn'], // Garder seulement error et warn
       },
-      // Supprimer les commentaires
-      removeComments: true,
     },
     
     // Minification agressive

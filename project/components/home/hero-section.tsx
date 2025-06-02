@@ -53,8 +53,8 @@ export function HeroSection() {
               </div>
             </div>
             
-            <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Association laïque, démocratique et indépendante, engagée contre toute forme de racisme et discrimination, au service des habitants d'Argenteuil.
+            <p className="text-lg text-white/90 mb-8 max-w-3xl mx-auto">
+              Association laïque, démocratique et indépendante, engagée contre toute forme de racisme et discrimination, au service des habitants d&apos;Argenteuil.
             </p>
             
             <motion.div 
@@ -100,7 +100,7 @@ export function HeroSection() {
                 </div>
                 <div>
                   <h3 className="font-semibold">Les chibanis</h3>
-                  <p className="text-sm text-gray-200">Accompagnement des personnes âgées d'origine immigrée réfugiée dans leurs démarches, animation de rencontres et sorties culturelles.</p>
+                  <p className="text-sm text-gray-200">Accompagnement des personnes âgées d&apos;origine immigrée réfugiée dans leurs démarches, animation de rencontres et sorties culturelles.</p>
                 </div>
               </motion.div>
               
@@ -115,7 +115,7 @@ export function HeroSection() {
                 </div>
                 <div>
                   <h3 className="font-semibold">Les enfants et jeunes</h3>
-                  <p className="text-sm text-gray-200">Soutien scolaire, activités périscolaires, et ateliers culturels pour favoriser l'épanouissement et la réussite.</p>
+                  <p className="text-sm text-gray-200">Soutien scolaire, activités périscolaires, et ateliers culturels pour favoriser l&apos;épanouissement et la réussite.</p>
                 </div>
               </motion.div>
               
