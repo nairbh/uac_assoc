@@ -1,10 +1,11 @@
 # Robots.txt pour PACE ATMF Argenteuil - SEO OPTIMISÉ
 # Domination des résultats de recherche "ATMF"
 
+# Configuration générale pour tous les robots
 User-agent: *
 Allow: /
 
-# Priorité maximale pour les pages importantes
+# Priorité maximale pour les pages importantes ATMF
 Allow: /
 Allow: /about
 Allow: /contact
@@ -12,9 +13,21 @@ Allow: /events
 Allow: /donate
 Allow: /services
 Allow: /news
-Allow: /join
+Allow: /membership
+Allow: /legal
 
-# Bloquer les pages d'administration (ne pas indexer)
+# Autoriser l'indexation des ressources importantes
+Allow: /images/
+Allow: /favicon.*
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.webp
+Allow: /*.svg
+Allow: /site.webmanifest
+Allow: /browserconfig.xml
+
+# Bloquer les pages d'administration et sensibles
 Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
@@ -23,29 +36,33 @@ Disallow: /moderator/
 Disallow: /_next/
 Disallow: /signin
 Disallow: /signup
+Disallow: /unauthorized
+Disallow: /*.json$
+Disallow: /*?*utm_*
+Disallow: /*?*fbclid*
+Disallow: /*?*gclid*
 
-# Autoriser les images pour le SEO visuel
+# Optimisation pour Google (crawler principal)
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+Request-rate: 1/1s
+
+# Optimisation pour Google Images
+User-agent: Googlebot-Image
 Allow: /images/
-Allow: /favicon.ico
 Allow: /*.png
 Allow: /*.jpg
 Allow: /*.jpeg
 Allow: /*.webp
 Allow: /*.svg
 
-# Sitemap XML - CRUCIAL pour Google
-Sitemap: https://atmf-argenteuil.org/sitemap.xml
-
-# Optimisation spéciale pour les bots Google
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 1
-
+# Optimisation pour Bing
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 2
 
-# Autoriser tous les bots de réseaux sociaux pour partage
+# Autoriser les bots de réseaux sociaux pour le partage
 User-agent: facebookexternalhit
 Allow: /
 
@@ -55,7 +72,10 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-# Bloquer les bots malveillants
+User-agent: WhatsApp
+Allow: /
+
+# Bloquer les bots malveillants et scrapers
 User-agent: AhrefsBot
 Disallow: /
 
@@ -63,4 +83,17 @@ User-agent: MJ12bot
 Disallow: /
 
 User-agent: DotBot
-Disallow: / 
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MegaIndex
+Disallow: /
+
+# Sitemap XML - CRUCIAL pour Google
+Sitemap: https://atmf-argenteuil.org/sitemap.xml
+
+# Informations additionnelles pour les moteurs de recherche
+# Contact: atmfargent@gmail.com
+# Politique de crawl: Respectueuse, max 1 req/sec 

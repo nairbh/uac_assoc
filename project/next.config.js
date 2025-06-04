@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Configuration SEO et performance
   experimental: {
-    // Optimisations de performance
+    optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   
@@ -86,9 +87,12 @@ const nextConfig = {
     domains: [
       'images.unsplash.com',
       'avatars.githubusercontent.com',
-      'www.gravatar.com'
+      'www.gravatar.com',
+      'atmf-argenteuil.org'
     ],
     formats: ['image/webp', 'image/avif'],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // Configuration Netlify optimisée
@@ -98,6 +102,9 @@ const nextConfig = {
   // Variables d'environnement publiques sécurisées
   env: {
     CUSTOM_KEY: process.env.NODE_ENV,
+    SITE_URL: 'https://atmf-argenteuil.org',
+    SITE_NAME: 'PACE ATMF Argenteuil',
+    SITE_DESCRIPTION: 'Association laïque, démocratique et solidaire depuis 1985'
   },
   
   // Redirections de sécurité
@@ -121,6 +128,149 @@ const nextConfig = {
       },
     ];
   },
+
+  // Headers de sécurité et SEO
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()'
+          }
+        ]
+      },
+      {
+        // Cache optimal pour les ressources statiques
+        source: '/images/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        // Cache pour les favicons
+        source: '/favicon(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        // Headers spéciaux pour le sitemap
+        source: '/sitemap.xml',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/xml'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, s-maxage=86400'
+          }
+        ]
+      },
+      {
+        // Headers pour robots.txt
+        source: '/robots.txt',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/plain'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, s-maxage=86400'
+          }
+        ]
+      }
+    ]
+  },
+
+  // Redirections pour SEO
+  async redirects() {
+    return [
+      {
+        source: '/join',
+        destination: '/membership',
+        permanent: true,
+      },
+      {
+        source: '/services',
+        destination: '/about',
+        permanent: false,
+      }
+    ]
+  },
+
+  // Optimisation du build
+  swcMinify: true,
+  
+  // Configuration Webpack pour optimiser les performances
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Optimisation pour la production
+    if (!dev && !isServer) {
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      }
+    }
+    
+    return config
+  },
+
+  // Configuration pour le déploiement
+  output: 'standalone',
+  
+  // Optimisation des polices
+  optimizeFonts: true,
+
+  // Configuration pour l'analyse des bundles
+  ...(process.env.ANALYZE === 'true' && {
+    webpack: (config) => {
+      config.plugins.push(
+        new (require('@next/bundle-analyzer'))({
+          enabled: true,
+        })
+      )
+      return config
+    },
+  }),
+
+  // Gestion des erreurs 404 personnalisées pour SEO
+  async rewrites() {
+    return [
+      {
+        source: '/news/feed',
+        destination: '/api/feed',
+      },
+      {
+        source: '/events/feed',
+        destination: '/api/events-feed',
+      }
+    ]
+  }
 };
 
 module.exports = nextConfig;

@@ -10,12 +10,12 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   // TITRE OPTIMISÉ pour dominer "ATMF"
   title: {
-    default: 'PACE ATMF Argenteuil | Association ATMF Val d\'Argent Sud - Solidarité et Citoyenneté',
+    default: 'PACE ATMF Argenteuil | Association Laïque et Démocratique - Solidarité et Citoyenneté',
     template: '%s | PACE ATMF Argenteuil'
   },
   
-  // DESCRIPTION SEO ULTRA-OPTIMISÉE
-  description: 'PACE ATMF Argenteuil : Association Travailleurs Maghrébins de France à Argenteuil depuis 1985. ATMF laïque, démocratique, solidaire. Quartier Val d\'Argent Sud. Association ATMF membre du réseau national ATMF France.',
+  // DESCRIPTION SEO ULTRA-OPTIMISÉE sans référence maghrébine
+  description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d\'Argent Sud. Association membre du réseau national ATMF France.',
   
   // MOTS-CLÉS STRATÉGIQUES pour dominer "ATMF"
   keywords: [
@@ -24,23 +24,25 @@ export const metadata: Metadata = {
     'Association ATMF',
     'ATMF Val d\'Argent Sud',
     'ATMF 95100',
-    'Association Travailleurs Maghrébins France Argenteuil',
+    'Association laïque Argenteuil',
     'PACE ATMF',
-    'ATMF laïque Argenteuil',
-    'ATMF démocratique',
+    'ATMF laïque démocratique',
     'ATMF solidaire',
-    'Association ATMF Île-de-France',
+    'Association citoyenne Argenteuil',
+    'ATMF Île-de-France',
     'ATMF réseau national',
-    'ATMF immigrés refugiés',
+    'ATMF accompagnement scolaire',
     'ATMF citoyenneté',
     'ATMF Val de Seine',
-    'Association maghrébine Argenteuil',
+    'Association solidaire Argenteuil',
     'ATMF 26 Boulevard Général Leclerc',
-    'ATMF quartier populaire'
+    'ATMF quartier populaire',
+    'Association lutte discriminations',
+    'ATMF engagement citoyen'
   ].join(', '),
   
   authors: [{ name: 'PACE ATMF Argenteuil', url: 'https://atmf-argenteuil.org' }],
-  creator: 'PACE ATMF Argenteuil - Association ATMF',
+  creator: 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
   publisher: 'PACE ATMF Argenteuil',
   
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://atmf-argenteuil.org'),
@@ -51,10 +53,10 @@ export const metadata: Metadata = {
     'geo.placename': 'Argenteuil, Val d\'Oise',
     'geo.position': '48.9474;2.2482',
     'ICBM': '48.9474, 2.2482',
-    'DC.title': 'PACE ATMF Argenteuil - Association ATMF Val d\'Argent Sud',
+    'DC.title': 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
     'DC.creator': 'PACE ATMF Argenteuil',
-    'DC.subject': 'Association ATMF, solidarité, citoyenneté, Argenteuil',
-    'DC.description': 'Association PACE ATMF Argenteuil : ATMF laïque et démocratique depuis 1985',
+    'DC.subject': 'Association laïque, solidarité, citoyenneté, accompagnement scolaire, Argenteuil',
+    'DC.description': 'Association PACE ATMF Argenteuil : laïque, démocratique et solidaire depuis 1985',
     'DC.publisher': 'PACE ATMF Argenteuil',
     'DC.contributor': 'Réseau ATMF France',
     'DC.date': '1985-10',
@@ -70,6 +72,7 @@ export const metadata: Metadata = {
   // Favicons et icônes
   icons: {
     icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' }
@@ -78,7 +81,7 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
     ],
     other: [
-      { rel: 'mask-icon', url: '/favicon.png', color: '#dc2626' }
+      { rel: 'mask-icon', url: '/favicon.svg', color: '#dc2626' }
     ]
   },
   
@@ -90,15 +93,15 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fr_FR',
     url: 'https://atmf-argenteuil.org',
-    siteName: 'PACE ATMF Argenteuil - Association ATMF Val d\'Argent Sud',
-    title: 'PACE ATMF Argenteuil | Association ATMF Travailleurs Maghrébins France',
-    description: 'PACE ATMF Argenteuil : Association ATMF laïque, démocratique et solidaire depuis 1985. Quartier Val d\'Argent Sud, Argenteuil. Membre du réseau national ATMF France.',
+    siteName: 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
+    title: 'PACE ATMF Argenteuil | Association Laïque, Démocratique et Solidaire',
+    description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d\'Argent Sud.',
     images: [
       {
         url: '/images/logo.png',
         width: 1200,
         height: 630,
-        alt: 'PACE ATMF Argenteuil - Logo Association ATMF',
+        alt: 'PACE ATMF Argenteuil - Logo Association Laïque et Démocratique',
         type: 'image/png'
       }
     ],
@@ -118,11 +121,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@ATMF_Argenteuil',
     creator: '@ATMF_Argenteuil',
-    title: 'PACE ATMF Argenteuil - Association ATMF Solidaire',
-    description: 'PACE ATMF Argenteuil : Association ATMF laïque et démocratique depuis 1985. Val d\'Argent Sud, Argenteuil.',
+    title: 'PACE ATMF Argenteuil - Association Laïque et Solidaire',
+    description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Val d\'Argent Sud, Argenteuil.',
     images: {
       url: '/images/logo.png',
-      alt: 'PACE ATMF Argenteuil - Association ATMF'
+      alt: 'PACE ATMF Argenteuil - Association Laïque et Démocratique'
     }
   },
   
@@ -173,11 +176,12 @@ export default function RootLayout({
     <html lang="fr">
       <head>
         {/* Favicons */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="mask-icon" href="/favicon.png" color="#dc2626" />
+        <link rel="mask-icon" href="/favicon.svg" color="#dc2626" />
         
         {/* PWA et SEO */}
         <link rel="manifest" href="/site.webmanifest" />
@@ -215,12 +219,12 @@ export default function RootLayout({
               "@type": "Organization",
               "@id": "https://atmf-argenteuil.org/#organization",
               "name": "PACE ATMF Argenteuil",
-              "legalName": "PACE ATMF Argenteuil - Association Travailleurs Maghrébins de France",
+              "legalName": "PACE ATMF Argenteuil - Association Laïque et Démocratique",
               "alternateName": ["ATMF Argenteuil", "Association ATMF", "PACE ATMF"],
               "url": "https://atmf-argenteuil.org",
               "logo": "https://atmf-argenteuil.org/images/logo.png",
               "image": "https://atmf-argenteuil.org/images/logo.png",
-              "description": "Association PACE ATMF Argenteuil : laïque, démocratique et solidaire depuis 1985. Quartier Val d'Argent Sud.",
+              "description": "Association PACE ATMF Argenteuil : laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d'Argent Sud.",
               "foundingDate": "1985-10",
               "foundingLocation": {
                 "@type": "Place",
@@ -269,7 +273,8 @@ export default function RootLayout({
                 "Aide aux démarches administratives",
                 "Lutte contre les discriminations",
                 "Citoyenneté",
-                "Immigration"
+                "Engagement citoyen",
+                "Laïcité"
               ]
             })
           }}

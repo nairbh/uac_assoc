@@ -54,19 +54,19 @@ const BLOCKED_IPS = new Set([
 
 // Fonction pour vérifier si on est en mode développement
 function isDevelopment(): boolean {
-  return process.env.NODE_ENV === 'development';
+  return process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 }
 
 // Fonction pour vérifier si l'IP est locale/développement
 function isLocalIP(ip: string): boolean {
   const localIPs = ['127.0.0.1', '::1', 'localhost', 'unknown', ''];
-  return localIPs.includes(ip) || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.');
+  return localIPs.includes(ip) || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.') || ip.includes('wsl');
 }
 
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for');
   const realIP = request.headers.get('x-real-ip');
-  const ip = forwarded?.split(',')[0] || realIP || request.ip || 'unknown';
+  const ip = forwarded?.split(',')[0] || realIP || request.ip || 'localhost';
   return ip.trim();
 }
 
@@ -138,6 +138,11 @@ function isRateLimited(ip: string, isSensitive: boolean = false): boolean {
   }
   
   if (current.count >= limit) {
+    // En développement, seulement logger sans bloquer
+    if (isDevelopment()) {
+      console.log(`[DEV] Rate limit atteint pour ${ip} - ${current.count} requêtes`);
+      return false;
+    }
     logSecurityEvent(ip, 'RATE_LIMIT_EXCEEDED', `${current.count} requests in window`);
     return true;
   }
@@ -207,6 +212,15 @@ function blockSuspiciousIP(ip: string): boolean {
     return false;
   }
   
+  // En développement, ne jamais bloquer - seulement logger
+  if (isDevelopment()) {
+    const security = securityLogs.get(ip);
+    if (security && security.attempts > 5) {
+      console.log(`[DEV] IP ${ip} aurait été bloquée (${security.attempts} tentatives)`);
+    }
+    return false;
+  }
+  
   const now = Date.now();
   const security = securityLogs.get(ip);
   
@@ -226,7 +240,7 @@ function blockSuspiciousIP(ip: string): boolean {
   security.lastAttempt = now;
   
   // Bloquer après 10 tentatives suspectes (20 en développement)
-  const maxAttempts = isDevelopment() ? 20 : 10;
+  const maxAttempts = 10;
   if (security.attempts >= maxAttempts) {
     security.blocked = true;
     logSecurityEvent(ip, 'IP_BLOCKED', `${security.attempts} suspicious attempts`);
@@ -241,6 +255,15 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const userAgent = request.headers.get('user-agent') || '';
   const now = Date.now();
+  
+  // En développement, ignorer complètement pour les IPs locales
+  if (isDevelopment() && isLocalIP(ip)) {
+    // Seulement logger les accès aux routes admin pour debug
+    if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+      console.log(`[DEV] Accès local à ${pathname}`);
+    }
+    return NextResponse.next();
+  }
   
   // En développement, ignorer les ressources Next.js et statiques
   if (isDevelopment()) {

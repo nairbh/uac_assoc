@@ -1,7 +1,7 @@
 {
   "name": "PACE ATMF Argenteuil",
   "short_name": "PACE ATMF",
-  "description": "Association laïque et démocratique engagée pour la solidarité et contre les discriminations à Argenteuil",
+  "description": "Association laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations à Argenteuil",
   "theme_color": "#dc2626",
   "background_color": "#ffffff",
   "display": "standalone",
@@ -11,12 +11,14 @@
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/android-chrome-512x512.png", 
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 } 
