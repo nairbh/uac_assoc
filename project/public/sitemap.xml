@@ -28,12 +28,39 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/atmf-argenteuil" />
   </url>
 
+  <!-- Page PACE ATMF - PRIORITÉ MAXIMALE pour recherche PACE -->
+  <url>
+    <loc>https://atmf-argenteuil.org/pace-atmf</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/pace-atmf" />
+  </url>
+
+  <!-- Services ATMF - PRIORITÉ ÉLEVÉE pour recherche services -->
+  <url>
+    <loc>https://atmf-argenteuil.org/atmf-services</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/atmf-services" />
+  </url>
+
+  <!-- Histoire ATMF - PRIORITÉ ÉLEVÉE pour recherche histoire -->
+  <url>
+    <loc>https://atmf-argenteuil.org/atmf-histoire</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/atmf-histoire" />
+  </url>
+
   <!-- À propos ATMF - Histoire et valeurs -->
   <url>
     <loc>https://atmf-argenteuil.org/about</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/about" />
   </url>
 
@@ -42,7 +69,7 @@
     <loc>https://atmf-argenteuil.org/contact</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/contact" />
   </url>
 
@@ -51,7 +78,7 @@
     <loc>https://atmf-argenteuil.org/events</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/events" />
   </url>
 
@@ -60,7 +87,7 @@
     <loc>https://atmf-argenteuil.org/news</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/news" />
   </url>
 
@@ -69,7 +96,7 @@
     <loc>https://atmf-argenteuil.org/membership</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/membership" />
   </url>
 
@@ -78,17 +105,41 @@
     <loc>https://atmf-argenteuil.org/donate</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/donate" />
   </url>
 
-  <!-- Mentions légales -->
+  <!-- Pages légales -->
   <url>
     <loc>https://atmf-argenteuil.org/legal</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/legal" />
+  </url>
+
+  <url>
+    <loc>https://atmf-argenteuil.org/legal/terms</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/legal/terms" />
+  </url>
+
+  <url>
+    <loc>https://atmf-argenteuil.org/legal/privacy</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/legal/privacy" />
+  </url>
+
+  <url>
+    <loc>https://atmf-argenteuil.org/legal/cookies</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/legal/cookies" />
   </url>
 
   <!-- Pages de redirection (pour les moteurs de recherche) -->
