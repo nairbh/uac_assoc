@@ -442,9 +442,10 @@ export default function AdminDashboard() {
     const engagementScore = Math.min(100, Math.round(contentPerUser * 20 + (stats.publishedArticles / Math.max(1, stats.totalArticles)) * 30 + (stats.publishedEvents / Math.max(1, stats.totalEvents)) * 30));
     
     // Simulation de dons basée sur le nombre d'utilisateurs et d'événements
-    const estimatedDonations = Math.round(stats.totalUsers * 8 + stats.publishedEvents * 25 + stats.publishedArticles * 5);
+    // RESET: Aucun paiement effectué - toutes les stats financières à 0
+    const estimatedDonations = 0; // Était: Math.round(stats.totalUsers * 8 + stats.publishedEvents * 25 + stats.publishedArticles * 5);
     const donationGoal = 3600;
-    const donationProgress = Math.round((estimatedDonations / donationGoal) * 100);
+    const donationProgress = 0; // Était: Math.round((estimatedDonations / donationGoal) * 100);
     
     // Participation aux événements (simulation basée sur les données)
     const totalParticipants = events.reduce((sum, event) => sum + (event.current_participants || 0), 0);
@@ -493,14 +494,13 @@ export default function AdminDashboard() {
       }).length;
       
       // Simulation de dons basée sur l'activité réelle
-      const monthlyBaseAmount = 400;
-      const activityBonus = (monthArticles * 25) + (monthEvents * 50);
-      const amount = monthlyBaseAmount + activityBonus + Math.random() * 100;
+      // RESET: Aucun paiement effectué - montants mensuels à 0
+      const amount = 0; // Était: monthlyBaseAmount + activityBonus + Math.random() * 100;
       
       return {
         month,
-        amount: Math.round(amount),
-        percentage: Math.min(100, Math.round((amount / 2800) * 100)),
+        amount: 0, // Était: Math.round(amount)
+        percentage: 0, // Était: Math.min(100, Math.round((amount / 2800) * 100))
         articles: monthArticles,
         events: monthEvents
       };
