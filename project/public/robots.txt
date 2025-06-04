@@ -10,10 +10,9 @@ Allow: /
 Allow: /about
 Allow: /contact
 Allow: /events
-Allow: /donate
-Allow: /services
 Allow: /news
 Allow: /membership
+Allow: /donate
 Allow: /legal
 
 # Autoriser l'indexation des ressources importantes
@@ -41,6 +40,10 @@ Disallow: /*.json$
 Disallow: /*?*utm_*
 Disallow: /*?*fbclid*
 Disallow: /*?*gclid*
+
+# Rediriger les anciennes URLs (permettre l'exploration pour les redirections)
+Allow: /services
+Allow: /join
 
 # Optimisation pour Google (crawler principal)
 User-agent: Googlebot
@@ -96,4 +99,8 @@ Sitemap: https://atmf-argenteuil.org/sitemap.xml
 
 # Informations additionnelles pour les moteurs de recherche
 # Contact: atmfargent@gmail.com
-# Politique de crawl: Respectueuse, max 1 req/sec 
+# Politique de crawl: Respectueuse, max 1 req/sec
+
+# Instructions pour les versions alternatives du domaine
+# Version principale recommandée : https://atmf-argenteuil.org
+# Les versions www et http sont redirigées automatiquement 

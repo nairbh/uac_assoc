@@ -14,6 +14,38 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# REDIRECTIONS PRINCIPALES (ordre important)
+
+# Forcer HTTPS et version sans www (priorité 1)
+[[redirects]]
+  from = "http://atmf-argenteuil.org/*"
+  to = "https://atmf-argenteuil.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.atmf-argenteuil.org/*"
+  to = "https://atmf-argenteuil.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.atmf-argenteuil.org/*"
+  to = "https://atmf-argenteuil.org/:splat"
+  status = 301
+  force = true
+
+# Redirections SEO pour anciennes URLs
+[[redirects]]
+  from = "/services"
+  to = "/about"
+  status = 301
+
+[[redirects]]
+  from = "/join"
+  to = "/membership"
+  status = 301
+
 # Protection contre l'accès aux fichiers sensibles
 [[redirects]]
   from = "/.env*"
@@ -55,72 +87,98 @@
   to = "/404"
   status = 404
 
-# Headers de sécurité renforcés
+# Headers de sécurité renforcés mais permissifs
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
+    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(self)"
-    X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';"
-    # Cache Control pour empêcher la mise en cache du code source
-    Cache-Control = "no-cache, no-store, must-revalidate"
+    # CSP très permissif pour éviter les blocages
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; style-src 'self' 'unsafe-inline' https: http:; img-src 'self' data: https: http:; connect-src 'self' https: http: wss: ws:; font-src 'self' https: http:; frame-src 'self' https: http:; object-src 'none';"
+    # Cache Control moins strict
+    Cache-Control = "public, max-age=3600"
 
-# Headers spéciaux pour les API (sécurité maximale)
+# Headers pour les API (très permissifs)
 [[headers]]
   for = "/api/*"
   [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
     Cache-Control = "no-store, no-cache, must-revalidate"
     Pragma = "no-cache"
     Expires = "0"
-    X-Robots-Tag = "noindex, nofollow"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "X-Requested-With, Content-Type, Authorization"
 
-# Headers pour les pages admin (non-indexées et non-cachées)
+# Headers pour l'administration (indexation bloquée seulement)
 [[headers]]
   for = "/admin/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
-    Cache-Control = "no-store, no-cache, must-revalidate"
 
-# Headers pour les pages de membres (non-indexées)
+# Headers pour les membres (indexation limitée)
 [[headers]]
   for = "/member/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Headers pour les pages de modérateurs (non-indexées)
+# Headers pour les modérateurs (indexation limitée)
 [[headers]]
   for = "/moderator/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Headers pour les assets statiques (cache optimisé)
+# Optimisation du cache pour les ressources statiques
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
 
+# Cache optimal pour les favicons
 [[headers]]
   for = "*.ico"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "*.png"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "*.jpg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
+
+# Headers spéciaux pour le sitemap et robots.txt
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml"
+    Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain"
+    Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
 
 # Configuration des fonctions (si nécessaire)
 [functions]

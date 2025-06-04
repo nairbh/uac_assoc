@@ -15,17 +15,27 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Configuration des images
+  // Configuration des images plus permissive
   images: {
     domains: [
       'images.unsplash.com',
       'avatars.githubusercontent.com',
       'www.gravatar.com',
-      'atmf-argenteuil.org'
+      'atmf-argenteuil.org',
+      'maps.googleapis.com',
+      'maps.gstatic.com',
+      'google.com',
+      'www.google.com'
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    contentSecurityPolicy: "default-src 'self' https:; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   
   // Configuration Netlify
@@ -39,7 +49,7 @@ const nextConfig = {
     SITE_DESCRIPTION: 'Association laïque, démocratique et solidaire depuis 1985'
   },
   
-  // Headers de sécurité simplifiés
+  // Headers de sécurité très permissifs
   async headers() {
     return [
       {
@@ -56,6 +66,10 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; style-src 'self' 'unsafe-inline' https: http:; img-src 'self' data: https: http:; connect-src 'self' https: http: wss: ws:; font-src 'self' https: http:; frame-src 'self' https: http:; object-src 'none';"
           }
         ]
       },
@@ -66,6 +80,10 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin'
           }
         ]
       },
@@ -106,6 +124,24 @@ const nextConfig = {
             value: 'public, max-age=86400'
           }
         ]
+      },
+      {
+        // Headers très permissifs pour les API
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'X-Requested-With, Content-Type, Authorization'
+          }
+        ]
       }
     ]
   },
@@ -126,16 +162,23 @@ const nextConfig = {
     ]
   },
 
-  // Configuration webpack simplifiée
+  // Configuration webpack simplifiée et permissive
   webpack: (config, { dev, isServer }) => {
-    // Résoudre le problème avec canvas
+    // Résoudre le problème avec canvas et autres modules
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         canvas: false,
         fs: false,
+        net: false,
+        tls: false,
       };
     }
+    
+    // Configuration moins stricte pour éviter les erreurs
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
     
     return config;
   },

@@ -8,59 +8,81 @@ import { Footer } from '@/components/layout/footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  // TITRE OPTIMISÉ pour dominer "ATMF"
+  // TITRE ULTRA-OPTIMISÉ pour dominer "ATMF"
   title: {
-    default: 'PACE ATMF Argenteuil | Association Laïque et Démocratique - Solidarité et Citoyenneté',
-    template: '%s | PACE ATMF Argenteuil'
+    default: 'ATMF Argenteuil | PACE ATMF - Association ATMF Val d\'Argent Sud 95100',
+    template: '%s | ATMF Argenteuil - PACE ATMF'
   },
   
-  // DESCRIPTION SEO ULTRA-OPTIMISÉE sans référence maghrébine
-  description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d\'Argent Sud. Association membre du réseau national ATMF France.',
+  // DESCRIPTION SEO ULTRA-AGRESSIVE pour toutes les requêtes ATMF
+  description: 'ATMF Argenteuil : PACE ATMF, Association ATMF officielle à Argenteuil 95100. ATMF laïque, démocratique, solidaire depuis 1985. ATMF Val d\'Argent Sud. Réseau ATMF France. Association PACE ATMF Argenteuil, ATMF Île-de-France.',
   
-  // MOTS-CLÉS STRATÉGIQUES pour dominer "ATMF"
+  // MOTS-CLÉS ULTRA-STRATÉGIQUES pour dominer toutes les recherches ATMF
   keywords: [
-    'PACE ATMF Argenteuil',
-    'ATMF Argenteuil', 
-    'Association ATMF',
-    'ATMF Val d\'Argent Sud',
-    'ATMF 95100',
-    'Association laïque Argenteuil',
+    // Requêtes principales ATMF
+    'ATMF',
+    'ATMF Argenteuil',
     'PACE ATMF',
-    'ATMF laïque démocratique',
-    'ATMF solidaire',
-    'Association citoyenne Argenteuil',
+    'PACE ATMF Argenteuil',
+    'Association ATMF',
+    'ATMF 95100',
+    'ATMF Val d\'Argent Sud',
+    'ATMF Ile de France',
+    'ATMF France',
+    
+    // Variations orthographiques
+    'ATMF argenteuil',
+    'atmf Argenteuil',
+    'PACE atmf',
+    'pace ATMF',
+    'Association Travailleurs Maghrébins France',
+    'ATMF association',
+    
+    // Requêtes géolocalisées
+    'ATMF Argenteuil 95',
+    'ATMF Argenteuil 95100',
+    'ATMF Val d\'Oise',
     'ATMF Île-de-France',
-    'ATMF réseau national',
+    'ATMF région parisienne',
+    'ATMF banlieue nord',
+    
+    // Requêtes sectorielles
+    'ATMF laïque',
+    'ATMF démocratique',
+    'ATMF solidaire',
+    'ATMF engagement citoyen',
     'ATMF accompagnement scolaire',
-    'ATMF citoyenneté',
-    'ATMF Val de Seine',
-    'Association solidaire Argenteuil',
+    'ATMF lutte discriminations',
+    
+    // Variations longue traîne
+    'Association ATMF Argenteuil',
+    'PACE ATMF Val d\'Argent Sud',
     'ATMF 26 Boulevard Général Leclerc',
-    'ATMF quartier populaire',
-    'Association lutte discriminations',
-    'ATMF engagement citoyen'
+    'ATMF quartier populaire Argenteuil',
+    'ATMF réseau national France',
+    'ATMF immigrés réfugiés Argenteuil'
   ].join(', '),
   
   authors: [{ name: 'PACE ATMF Argenteuil', url: 'https://atmf-argenteuil.org' }],
-  creator: 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
-  publisher: 'PACE ATMF Argenteuil',
+  creator: 'PACE ATMF Argenteuil - Association ATMF officielle',
+  publisher: 'ATMF Argenteuil - PACE ATMF',
   
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://atmf-argenteuil.org'),
   
-  // GÉOLOCALISATION pour dominer les recherches locales "ATMF Argenteuil"
+  // GÉOLOCALISATION PRÉCISE pour dominer recherches locales "ATMF Argenteuil"
   other: {
     'geo.region': 'FR-95',
-    'geo.placename': 'Argenteuil, Val d\'Oise',
+    'geo.placename': 'Argenteuil, Val d\'Oise, Île-de-France',
     'geo.position': '48.9474;2.2482',
     'ICBM': '48.9474, 2.2482',
-    'DC.title': 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
+    'DC.title': 'ATMF Argenteuil - PACE ATMF Association officielle',
     'DC.creator': 'PACE ATMF Argenteuil',
-    'DC.subject': 'Association laïque, solidarité, citoyenneté, accompagnement scolaire, Argenteuil',
-    'DC.description': 'Association PACE ATMF Argenteuil : laïque, démocratique et solidaire depuis 1985',
+    'DC.subject': 'ATMF, PACE ATMF, Association ATMF, Argenteuil, solidarité, laïcité',
+    'DC.description': 'ATMF Argenteuil : PACE ATMF association officielle depuis 1985, laïque et démocratique',
     'DC.publisher': 'PACE ATMF Argenteuil',
     'DC.contributor': 'Réseau ATMF France',
     'DC.date': '1985-10',
-    'DC.type': 'Association',
+    'DC.type': 'Association ATMF',
     'DC.format': 'text/html',
     'DC.identifier': 'https://atmf-argenteuil.org',
     'DC.source': 'https://atmf-argenteuil.org',
@@ -88,20 +110,20 @@ export const metadata: Metadata = {
   // Manifeste PWA
   manifest: '/site.webmanifest',
   
-  // OPEN GRAPH OPTIMISÉ pour partage social "ATMF"
+  // OPEN GRAPH ULTRA-OPTIMISÉ pour partage social et SEO
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
     url: 'https://atmf-argenteuil.org',
-    siteName: 'PACE ATMF Argenteuil - Association Laïque et Démocratique',
-    title: 'PACE ATMF Argenteuil | Association Laïque, Démocratique et Solidaire',
-    description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d\'Argent Sud.',
+    siteName: 'ATMF Argenteuil - PACE ATMF Association officielle',
+    title: 'ATMF Argenteuil | PACE ATMF - Association ATMF Val d\'Argent Sud',
+    description: 'ATMF Argenteuil : PACE ATMF association officielle depuis 1985. ATMF laïque, démocratique, solidaire. Val d\'Argent Sud 95100. Réseau ATMF France.',
     images: [
       {
         url: '/images/logo.png',
         width: 1200,
         height: 630,
-        alt: 'PACE ATMF Argenteuil - Logo Association Laïque et Démocratique',
+        alt: 'ATMF Argenteuil - PACE ATMF Logo Association officielle',
         type: 'image/png'
       }
     ],
@@ -121,11 +143,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@ATMF_Argenteuil',
     creator: '@ATMF_Argenteuil',
-    title: 'PACE ATMF Argenteuil - Association Laïque et Solidaire',
-    description: 'PACE ATMF Argenteuil : Association laïque, démocratique et solidaire depuis 1985. Val d\'Argent Sud, Argenteuil.',
+    title: 'ATMF Argenteuil - PACE ATMF Association officielle',
+    description: 'ATMF Argenteuil : PACE ATMF depuis 1985. Association ATMF laïque et démocratique. Val d\'Argent Sud.',
     images: {
       url: '/images/logo.png',
-      alt: 'PACE ATMF Argenteuil - Association Laïque et Démocratique'
+      alt: 'ATMF Argenteuil - PACE ATMF Association'
     }
   },
   
@@ -218,17 +240,17 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "@id": "https://atmf-argenteuil.org/#organization",
-              "name": "PACE ATMF Argenteuil",
-              "legalName": "PACE ATMF Argenteuil - Association Laïque et Démocratique",
-              "alternateName": ["ATMF Argenteuil", "Association ATMF", "PACE ATMF"],
+              "name": "ATMF Argenteuil",
+              "legalName": "PACE ATMF Argenteuil - Association ATMF officielle",
+              "alternateName": ["PACE ATMF", "Association ATMF", "ATMF 95100", "ATMF Val d'Argent Sud", "ATMF Île-de-France"],
               "url": "https://atmf-argenteuil.org",
               "logo": "https://atmf-argenteuil.org/images/logo.png",
               "image": "https://atmf-argenteuil.org/images/logo.png",
-              "description": "Association PACE ATMF Argenteuil : laïque, démocratique et solidaire depuis 1985. Engagement citoyen, accompagnement scolaire, lutte contre les discriminations. Quartier Val d'Argent Sud.",
+              "description": "ATMF Argenteuil : PACE ATMF, association ATMF officielle depuis 1985. ATMF laïque, démocratique et solidaire. ATMF Val d'Argent Sud 95100. Réseau ATMF France.",
               "foundingDate": "1985-10",
               "foundingLocation": {
                 "@type": "Place",
-                "name": "Argenteuil, France"
+                "name": "Argenteuil, Île-de-France, France"
               },
               "address": {
                 "@type": "PostalAddress",
@@ -263,19 +285,35 @@ export default function RootLayout({
                 "name": "Réseau National ATMF France",
                 "url": "https://www.atmf.org"
               },
-              "areaServed": {
-                "@type": "Place",
-                "name": "Argenteuil et Val d'Oise"
-              },
+              "areaServed": [
+                {
+                  "@type": "Place",
+                  "name": "Argenteuil"
+                },
+                {
+                  "@type": "Place", 
+                  "name": "Val d'Oise"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Île-de-France"
+                }
+              ],
               "knowsAbout": [
+                "ATMF Argenteuil",
+                "PACE ATMF",
+                "Association ATMF",
                 "Solidarité internationale",
                 "Accompagnement scolaire",
                 "Aide aux démarches administratives",
                 "Lutte contre les discriminations",
                 "Citoyenneté",
                 "Engagement citoyen",
-                "Laïcité"
-              ]
+                "Laïcité",
+                "ATMF Val d'Argent Sud",
+                "Réseau ATMF France"
+              ],
+              "keywords": "ATMF, ATMF Argenteuil, PACE ATMF, Association ATMF, ATMF 95100, ATMF Île-de-France, ATMF laïque, ATMF démocratique, ATMF solidaire"
             })
           }}
         />

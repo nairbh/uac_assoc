@@ -14,9 +14,18 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/" />
     <image:image>
       <image:loc>https://atmf-argenteuil.org/images/logo.png</image:loc>
-      <image:title>PACE ATMF Argenteuil - Logo Association Laïque</image:title>
-      <image:caption>Association PACE ATMF Argenteuil - Laïque, démocratique et solidaire depuis 1985</image:caption>
+      <image:title>ATMF Argenteuil - PACE ATMF Logo Association officielle</image:title>
+      <image:caption>ATMF Argenteuil - PACE ATMF Association officielle depuis 1985</image:caption>
     </image:image>
+  </url>
+
+  <!-- Page ATMF Argenteuil dédiée - PRIORITÉ MAXIMALE SEO -->
+  <url>
+    <loc>https://atmf-argenteuil.org/atmf-argenteuil</loc>
+    <lastmod>2024-12-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/atmf-argenteuil" />
   </url>
 
   <!-- À propos ATMF - Histoire et valeurs -->
@@ -55,21 +64,12 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/news" />
   </url>
 
-  <!-- Services et accompagnement -->
-  <url>
-    <loc>https://atmf-argenteuil.org/services</loc>
-    <lastmod>2024-12-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/services" />
-  </url>
-
   <!-- Adhésion ATMF -->
   <url>
     <loc>https://atmf-argenteuil.org/membership</loc>
     <lastmod>2024-12-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/membership" />
   </url>
 
@@ -91,38 +91,21 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/legal" />
   </url>
 
-  <!-- Pages spécifiques d'événements (exemples) -->
+  <!-- Pages de redirection (pour les moteurs de recherche) -->
   <url>
-    <loc>https://atmf-argenteuil.org/events/solidarite-internationale</loc>
+    <loc>https://atmf-argenteuil.org/services</loc>
     <lastmod>2024-12-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/events/solidarite-internationale" />
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/services" />
   </url>
 
   <url>
-    <loc>https://atmf-argenteuil.org/events/accompagnement-scolaire</loc>
+    <loc>https://atmf-argenteuil.org/join</loc>
     <lastmod>2024-12-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/events/accompagnement-scolaire" />
-  </url>
-
-  <!-- Pages spécifiques d'actualités (exemples) -->
-  <url>
-    <loc>https://atmf-argenteuil.org/news/lutte-discriminations</loc>
-    <lastmod>2024-12-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/news/lutte-discriminations" />
-  </url>
-
-  <url>
-    <loc>https://atmf-argenteuil.org/news/engagement-citoyen</loc>
-    <lastmod>2024-12-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/news/engagement-citoyen" />
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://atmf-argenteuil.org/join" />
   </url>
 
 </urlset> 

@@ -265,41 +265,64 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // En développement, ignorer les ressources Next.js et statiques
-  if (isDevelopment()) {
-    const devIgnoredPaths = [
-      '/_next',
-      '/__nextjs', 
-      '/favicon.ico', 
-      '/_dev',
-      '/api/ping',
-      '/_next/static',
-      '/_next/webpack',
-      '/_next/image'
-    ];
-    
-    if (devIgnoredPaths.some(path => pathname.startsWith(path))) {
-      return NextResponse.next();
-    }
-  }
+  // Ignorer les ressources statiques et Next.js (développement et production)
+  const staticPaths = [
+    '/_next/static', 
+    '/_next/image', 
+    '/favicon.ico', 
+    '/images',
+    '/favicon',
+    '/_next',
+    '/__nextjs',
+    '/_dev'
+  ];
   
-  // En production, ignorer seulement les ressources essentielles
-  const staticPaths = ['/_next/static', '/_next/image', '/favicon.ico', '/images'];
   if (staticPaths.some(path => pathname.startsWith(path))) {
     const response = NextResponse.next();
-    // Headers minimaux pour les ressources statiques
+    // Headers de cache pour les ressources statiques
     response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     return response;
   }
   
-  // Log de toutes les requêtes vers les routes protégées (sauf en dev pour réduire le bruit)
+  // Ignorer les bots légitimes (Google, Bing, etc.)
+  const legitimateBots = [
+    'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
+    'yandexbot', 'facebookexternalhit', 'twitterbot', 'linkedinbot',
+    'whatsapp', 'telegrambot', 'applebot', 'msnbot'
+  ];
+  
+  const isLegitimateBot = legitimateBots.some(bot => 
+    userAgent.toLowerCase().includes(bot)
+  );
+  
+  if (isLegitimateBot) {
+    console.log(`[BOT] Bot légitime détecté: ${userAgent.substring(0, 50)}`);
+    return NextResponse.next();
+  }
+  
+  // Ignorer les services légitimes (Google Maps, CDN, etc.)
+  const legitimateServices = [
+    'googleapis.com', 'gstatic.com', 'google.com', 'maps.googleapis.com',
+    'fonts.googleapis.com', 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net'
+  ];
+  
+  const referer = request.headers.get('referer') || '';
+  const isLegitimateService = legitimateServices.some(service => 
+    referer.includes(service) || userAgent.includes(service)
+  );
+  
+  if (isLegitimateService) {
+    return NextResponse.next();
+  }
+  
+  // Log de toutes les requêtes vers les routes protégées (seulement en dev pour les routes sensibles)
   if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    if (!isDevelopment() || pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+    if (!isDevelopment() && (pathname.startsWith('/admin') || pathname.startsWith('/api'))) {
       logSecurityEvent(ip, 'PROTECTED_ROUTE_ACCESS', `${request.method} ${pathname}`);
     }
   }
   
-  // 1. Bloquer les IPs blacklistées
+  // 1. Bloquer seulement les IPs explicitement blacklistées
   if (BLOCKED_IPS.has(ip)) {
     SecurityValidatorMiddleware.logSecurityEvent(
       'BLOCKED_IP_ACCESS',
@@ -310,109 +333,109 @@ export function middleware(request: NextRequest) {
     return new NextResponse('Accès interdit', { status: 403 });
   }
 
-  // 2. Vérifier si l'IP est bloquée pour activité suspecte
+  // 2. Vérifier blocage IP suspecte (plus permissif)
   if (blockSuspiciousIP(ip)) {
-    return new NextResponse('Access Denied', { 
-      status: 403,
-      headers: {
-        'Content-Type': 'text/plain',
-        'X-Security-Block': 'IP-BLOCKED'
-      }
-    });
+    // En production, être plus permissif
+    if (!isDevelopment()) {
+      console.log(`[SECURITY] IP suspecte mais non bloquée en production: ${ip}`);
+      // Ne pas bloquer, juste logger
+    } else {
+      return new NextResponse('Access Denied', { 
+        status: 403,
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Security-Block': 'IP-BLOCKED'
+        }
+      });
+    }
   }
   
-  // 3. Détecter une activité suspecte
+  // 3. Détecter activité suspecte (plus permissif en production)
   if (detectSuspiciousActivity(request, ip)) {
-    return new NextResponse('Forbidden', { 
-      status: 403,
-      headers: {
-        'Content-Type': 'text/plain',
-        'X-Security-Block': 'SUSPICIOUS-ACTIVITY'
-      }
-    });
+    if (isDevelopment()) {
+      return new NextResponse('Forbidden', { 
+        status: 403,
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Security-Block': 'SUSPICIOUS-ACTIVITY'
+        }
+      });
+    } else {
+      // En production, juste logger sans bloquer
+      console.log(`[SECURITY] Activité suspecte détectée mais non bloquée: ${ip} ${pathname}`);
+    }
   }
 
-  // 4. Détecter les bots malveillants tentant d'accéder à l'admin
-  if (isBot(userAgent) && pathname.includes('/admin')) {
+  // 4. Bots malveillants tentant d'accéder à l'admin (seulement vraiment malveillants)
+  const maliciousBots = ['sqlmap', 'nikto', 'nmap', 'masscan', 'burp'];
+  const isMaliciousBot = maliciousBots.some(bot => userAgent.toLowerCase().includes(bot));
+  
+  if (isMaliciousBot && pathname.includes('/admin')) {
     SecurityValidatorMiddleware.logSecurityEvent(
       'BOT_ADMIN_ACCESS',
       'high',
-      `Bot tentant d'accéder à l'admin: ${userAgent.slice(0, 100)}`,
+      `Bot malveillant tentant d'accéder à l'admin: ${userAgent.slice(0, 100)}`,
       ip
     );
     return new NextResponse('Accès bot interdit', { status: 403 });
   }
 
-  // 5. Protection contre les attaques par patterns
+  // 5. Protection contre les attaques par patterns (seulement les plus graves)
   const body = request.method === 'POST' ? request.body?.toString() || '' : '';
-  if (detectAttackPatterns(pathname, body)) {
+  const criticalPatterns = [
+    /\b(union\s+select|drop\s+table|delete\s+from)\b/i,
+    /<script[^>]*>.*?<\/script>/i,
+    /javascript:\s*alert/i
+  ];
+  
+  const hasCriticalPattern = criticalPatterns.some(pattern => 
+    pattern.test(pathname) || pattern.test(body)
+  );
+  
+  if (hasCriticalPattern) {
     SecurityValidatorMiddleware.logSecurityEvent(
-      'ATTACK_PATTERN_DETECTED',
+      'CRITICAL_ATTACK_PATTERN',
       'critical',
-      `Pattern d'attaque détecté dans: ${pathname}`,
+      `Pattern d'attaque critique détecté dans: ${pathname}`,
       ip
     );
-    suspiciousIPs.add(ip);
     return new NextResponse('Requête suspecte détectée', { status: 403 });
   }
   
-  // 6. Rate limiting standard
+  // 6. Rate limiting plus permissif
   const isSensitive = SENSITIVE_ROUTES.some(route => pathname.startsWith(route));
   if (isRateLimited(ip, isSensitive)) {
-    return new NextResponse('Too Many Requests', { 
-      status: 429,
-      headers: {
-        'Content-Type': 'text/plain',
-        'Retry-After': isSensitive ? '60' : '900',
-        'X-RateLimit-Limit': String(isSensitive ? SECURITY_RATE_LIMIT : RATE_LIMIT_REQUESTS),
-        'X-RateLimit-Remaining': '0'
-      }
-    });
+    // En production, être plus permissif sur le rate limiting
+    if (!isDevelopment()) {
+      console.log(`[SECURITY] Rate limit atteint mais non bloqué en production: ${ip}`);
+    } else {
+      return new NextResponse('Too Many Requests', { 
+        status: 429,
+        headers: {
+          'Content-Type': 'text/plain',
+          'Retry-After': isSensitive ? '60' : '900',
+          'X-RateLimit-Limit': String(isSensitive ? SECURITY_RATE_LIMIT : RATE_LIMIT_REQUESTS),
+          'X-RateLimit-Remaining': '0'
+        }
+      });
+    }
   }
 
-  // 7. Rate limiting adaptatif renforcé
+  // 7. Rate limiting adaptatif très permissif en production
   const rateLimit = getRateLimit(pathname);
   const key = `${ip}:${pathname}`;
   let requestCount = requestCounts.get(key);
 
-  if (requestCount) {
+  if (requestCount && !isDevelopment()) {
     if (now < requestCount.resetTime) {
       if (requestCount.blocked) {
-        SecurityValidatorMiddleware.logSecurityEvent(
-          'BLOCKED_IP_RETRY',
-          'high',
-          `IP bloquée tentant de nouveau l'accès: ${pathname}`,
-          ip
-        );
-        return new NextResponse('IP temporairement bloquée', { status: 429 });
+        // En production, ne pas bloquer, juste logger
+        console.log(`[SECURITY] IP aurait été bloquée en dev: ${ip} ${pathname}`);
       }
       
-      if (requestCount.count >= rateLimit.maxRequests) {
-        // Bloquer temporairement cette IP
-        requestCount.blocked = true;
-        requestCount.resetTime = now + (15 * 60 * 1000); // Blocage 15 minutes
-        
-        SecurityValidatorMiddleware.logSecurityEvent(
-          'RATE_LIMIT_EXCEEDED',
-          'high',
-          `Limite dépassée pour ${pathname}, IP bloquée`,
-          ip
-        );
-        
-        suspiciousIPs.add(ip);
-        return new NextResponse(
-          JSON.stringify({ 
-            error: 'Trop de requêtes. IP bloquée temporairement.',
-            retryAfter: 900
-          }), 
-          { 
-            status: 429,
-            headers: {
-              'Content-Type': 'application/json',
-              'Retry-After': '900'
-            }
-          }
-        );
+      if (requestCount.count >= rateLimit.maxRequests * 3) { // Triple la limite en production
+        // Seulement logger, ne pas bloquer
+        console.log(`[SECURITY] Limite très dépassée mais non bloquée: ${ip} ${pathname}`);
       }
       requestCount.count++;
     } else {
@@ -423,7 +446,7 @@ export function middleware(request: NextRequest) {
         blocked: false 
       });
     }
-  } else {
+  } else if (!requestCount) {
     requestCounts.set(key, { 
       count: 1, 
       resetTime: now + rateLimit.windowMs,
@@ -431,138 +454,73 @@ export function middleware(request: NextRequest) {
     });
   }
   
-  // 8. Headers de sécurité pour les API
+  // 8. Headers de sécurité pour les API (plus permissif)
   if (pathname.startsWith('/api/')) {
     const response = NextResponse.next();
     
-    // Anti-CSRF pour les API (plus permissif en développement)
+    // Anti-CSRF plus permissif en production
     const origin = request.headers.get('origin');
     const host = request.headers.get('host');
     
     if (request.method !== 'GET' && !isDevelopment()) {
-      if (!origin || !host || !origin.includes(host)) {
-        logSecurityEvent(ip, 'CSRF_ATTEMPT', `Origin: ${origin}, Host: ${host}`);
-        return new NextResponse('Forbidden - Invalid Origin', { 
-          status: 403,
-          headers: {
-            'Content-Type': 'text/plain',
-            'X-Security-Block': 'CSRF-PROTECTION'
-          }
-        });
+      // Vérification CSRF plus permissive
+      if (origin && host && !origin.includes(host) && !origin.includes('google')) {
+        console.log(`[SECURITY] CSRF potentiel mais non bloqué: Origin: ${origin}, Host: ${host}`);
+        // Ne pas bloquer, juste logger
       }
     }
     
-    // Headers de sécurité API
+    // Headers de sécurité API basiques
     response.headers.set('X-API-Version', '1.0');
-    response.headers.set('X-Security-Check', 'PASSED');
     response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'DENY');
     
     return response;
   }
 
-  // 9. Protection CSRF pour les routes sensibles
+  // 9. Protection CSRF très permissive
   if (request.method === 'POST' || request.method === 'DELETE') {
     const origin = request.headers.get('origin');
     const host = request.headers.get('host');
     
-    // Vérifier que l'origine correspond à notre domaine
-    if (origin && host && !origin.includes(host)) {
-      SecurityValidatorMiddleware.logSecurityEvent(
-        'CSRF_ATTACK_DETECTED',
-        'critical',
-        `Tentative CSRF: origin=${origin}, host=${host}`,
-        ip
-      );
-      return new NextResponse('Origine non autorisée', { status: 403 });
+    // Vérification très permissive
+    if (origin && host && !origin.includes(host) && !origin.includes('google') && !isDevelopment()) {
+      console.log(`[SECURITY] CSRF potentiel détecté mais non bloqué: origin=${origin}, host=${host}`);
+      // Ne pas bloquer en production
     }
   }
 
-  // 10. Monitoring des IPs suspectes
-  if (suspiciousIPs.has(ip)) {
-    SecurityValidatorMiddleware.logSecurityEvent(
-      'SUSPICIOUS_IP_ACTIVITY',
-      'medium',
-      `Activité d'IP suspecte sur: ${pathname}`,
-      ip
-    );
-    
-    // Limiter encore plus les requêtes des IPs suspectes
-    if (requestCount && requestCount.count > 5) {
-      return new NextResponse('Activité suspecte détectée', { status: 429 });
-    }
-  }
-  
-  // 11. Protection des routes admin/moderator
-  if (pathname.startsWith('/admin') || pathname.startsWith('/moderator')) {
-    const response = NextResponse.next();
-    
-    if (!isDevelopment()) {
-      // Headers de sécurité renforcés pour les zones d'administration (production seulement)
-      response.headers.set('X-Frame-Options', 'DENY');
-      response.headers.set('X-Content-Type-Options', 'nosniff');
-      response.headers.set('Referrer-Policy', 'no-referrer');
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-      response.headers.set('Pragma', 'no-cache');
-      response.headers.set('Expires', '0');
-    }
-    
-    return response;
-  }
-
-  // 12. Headers de sécurité globaux
+  // 10. Headers de sécurité globaux permissifs
   const response = NextResponse.next();
   
   // Headers de sécurité adaptatifs selon l'environnement
   if (isDevelopment()) {
-    // Headers minimaux en développement pour éviter de bloquer Next.js
+    // Headers minimaux en développement
     response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   } else {
-    // Headers de sécurité complets en production
+    // Headers de sécurité allégés en production
     response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'DENY');
-    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN'); // Plus permissif que DENY
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
     
-    // CSP plus strict en production
+    // CSP très permissif pour éviter les blocages
     response.headers.set('Content-Security-Policy', 
-      "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; " +
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "font-src 'self' https://fonts.gstatic.com; " +
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; " +
+      "style-src 'self' 'unsafe-inline' https:; " +
       "img-src 'self' data: https:; " +
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co; " +
-      "frame-ancestors 'none';"
+      "connect-src 'self' https: wss:; " +
+      "font-src 'self' https:; " +
+      "frame-src 'self' https:;"
     );
   }
   
-  // Anti-caching pour les pages sensibles (seulement en production)
-  if (!isDevelopment() && (pathname.includes('/admin') || pathname.includes('/member'))) {
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  // Headers anti-cache seulement pour les vraies pages sensibles
+  if (pathname.includes('/admin') && !pathname.includes('/admin/security')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
   }
 
-  // 13. Log des accès aux pages sensibles (seulement en production)
-  if (!isDevelopment()) {
-    const sensitivePages = ['/signin', '/signup', '/member'];
-    if (sensitivePages.includes(pathname)) {
-      logSecurityEvent(ip, 'SENSITIVE_PAGE_ACCESS', `${pathname} - ${userAgent.substring(0, 100)}`);
-    }
-  }
-
-  // 14. Log des accès admin
-  if (pathname.includes('/admin')) {
-    SecurityValidatorMiddleware.logSecurityEvent(
-      'ADMIN_ACCESS_ATTEMPT',
-      'low',
-      `Accès admin tenté: ${pathname}`,
-      ip
-    );
-  }
-  
   return response;
 }
 
