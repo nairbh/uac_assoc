@@ -1,5 +1,15 @@
-import DOMPurify from 'isomorphic-dompurify';
 import { z } from 'zod';
+
+// Import conditionnel de DOMPurify pour éviter les problèmes côté serveur
+let DOMPurify: any = null;
+if (typeof window !== 'undefined') {
+  // Côté client seulement
+  try {
+    DOMPurify = require('isomorphic-dompurify');
+  } catch (e) {
+    console.warn('DOMPurify non disponible:', e);
+  }
+}
 
 // Types pour la validation
 export interface ValidationResult {
@@ -122,23 +132,44 @@ export class SecurityValidator {
   static sanitizeHtml(input: string): string {
     if (typeof input !== 'string') return '';
     
-    // Configuration stricte de DOMPurify
-    const clean = DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p'],
-      ALLOWED_ATTR: [],
-      FORBID_ATTR: ['style', 'class', 'id'],
-      FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style', 'img'],
-    });
-    
-    if (clean !== input) {
-      this.logSecurityEvent(
-        'HTML_SANITIZATION',
-        'medium',
-        `HTML potentiellement malveillant détecté et nettoyé`
-      );
+    // Si DOMPurify est disponible (côté client)
+    if (DOMPurify) {
+      // Configuration stricte de DOMPurify
+      const clean = DOMPurify.sanitize(input, {
+        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p'],
+        ALLOWED_ATTR: [],
+        FORBID_ATTR: ['style', 'class', 'id'],
+        FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style', 'img'],
+      });
+      
+      if (clean !== input) {
+        this.logSecurityEvent(
+          'HTML_SANITIZATION',
+          'medium',
+          `HTML potentiellement malveillant détecté et nettoyé`
+        );
+      }
+      
+      return clean;
+    } else {
+      // Fallback côté serveur : sanitisation basique
+      let clean = input
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+        .trim();
+      
+      if (clean !== input) {
+        this.logSecurityEvent(
+          'HTML_SANITIZATION',
+          'medium',
+          `HTML potentiellement malveillant détecté et nettoyé (fallback)`
+        );
+      }
+      
+      return clean;
     }
-    
-    return clean;
   }
   
   // Validation et sanitisation des entrées

@@ -26,6 +26,7 @@ import {
   Globe
 } from 'lucide-react';
 import { SecurityValidator, SecurityAuditLog } from '@/lib/security';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SecurityStats {
   totalEvents: number;
@@ -35,6 +36,9 @@ interface SecurityStats {
   failedLogins: number;
   suspiciousActivity: number;
 }
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export default function SecurityDashboard() {
   const [logs, setLogs] = useState<SecurityAuditLog[]>([]);
