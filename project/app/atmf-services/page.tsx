@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     description: 'Découvrez tous les services ATMF proposés par PACE ATMF Argenteuil : accompagnement scolaire, FLE, aide administrative, soutien aux chibanis.',
     url: 'https://atmf-argenteuil.org/atmf-services',
   },
-  canonical: 'https://atmf-argenteuil.org/atmf-services',
+  alternates: {
+    canonical: 'https://atmf-argenteuil.org/atmf-services',
+  },
 };
 
 export default function ATMFServicesPage() {

@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     description: 'PACE ATMF Argenteuil, association laïque, démocratique et indépendante depuis 1985. Découvrez les actions de PACE ATMF dans le quartier Val d\'Argent Sud.',
     url: 'https://atmf-argenteuil.org/pace-atmf',
   },
-  canonical: 'https://atmf-argenteuil.org/pace-atmf',
+  alternates: {
+    canonical: 'https://atmf-argenteuil.org/pace-atmf',
+  },
 };
 
 export default function PaceATMFPage() {

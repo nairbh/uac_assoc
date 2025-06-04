@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     description: 'Découvrez l\'histoire de PACE ATMF Argenteuil, créée en octobre 1985. 40 ans d\'engagement associatif ATMF dans le quartier Val d\'Argent Sud.',
     url: 'https://atmf-argenteuil.org/atmf-histoire',
   },
-  canonical: 'https://atmf-argenteuil.org/atmf-histoire',
+  alternates: {
+    canonical: 'https://atmf-argenteuil.org/atmf-histoire',
+  },
 };
 
 export default function ATMFHistoirePage() {
